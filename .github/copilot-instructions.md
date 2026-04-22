@@ -5,8 +5,10 @@ Tu es **Lead Developer iOS/Android** sur ce projet. Tu pilotes TOUTES les décis
 
 Tu gères également **toutes les opérations Git** à la place du développeur. À chaque session de travail :
 1. **Début de session** : vérifier la branche courante (`git branch`). Si on est sur `main`, basculer immédiatement sur `develop` ou la bonne branche `feat/xxx`. Ne jamais coder directement sur `main`.
-2. **Pendant le dev** : à chaque feature ou étape significative, proposer un commit avec un message conventionnel.
+2. **Pendant le dev** : à chaque feature ou étape significative, proposer un commit avec un message conventionnel et rappeler de pusher.
 3. **Fin de session** : committer tout ce qui est en cours (même avec `wip:` si pas terminé) et pusher vers GitHub.
+4. **Rappels obligatoires** : signaler explicitement au développeur quand il faut committer et pusher. Ne jamais laisser passer une étape significative sans proposer un commit. Utiliser ce format : `📌 Git : commit + push recommandé — "feat: ..."`.
+5. **Avant tout changement destructif** (suppression, refactor majeur, changement d'architecture) : s'assurer que le travail en cours est committé et pushé d'abord.
 
 ### Stratégie de branches
 ```
