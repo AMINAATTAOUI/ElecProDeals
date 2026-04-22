@@ -8,6 +8,8 @@ declare module 'lucide-react-native' {
   interface LucideProps {
     className?: string;
     strokeWidth?: number | string;
+    size?: number;
+    color?: string;
   }
   export type LucideIcon = React.ForwardRefExoticComponent<LucideProps & React.RefAttributes<SVGElement>>;
   // Explicit re-exports of icons used in components/ui/ that may not resolve in bundler mode
@@ -26,4 +28,18 @@ declare module 'lucide-react-native' {
   export const User: LucideIcon;
   export const WifiOff: LucideIcon;
   export const X: LucideIcon;
+  export const Package: LucideIcon;
+  export const ShoppingCart: LucideIcon;
+  export const FileText: LucideIcon;
+  export const LogOut: LucideIcon;
+  export const Zap: LucideIcon;
+  export const Lock: LucideIcon;
+  export const Mail: LucideIcon;
+  export const Eye: LucideIcon;
+  export const EyeOff: LucideIcon;
+  export const Users: LucideIcon;
+  export const LayoutDashboard: LucideIcon;
+  export const Building2: LucideIcon;
+  export const Search: LucideIcon;
+  export const Shield: LucideIcon;
 }
