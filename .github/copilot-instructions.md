@@ -1,7 +1,20 @@
 # ElecProDeals — Instructions Lead Developer
 
 ## Rôle & Posture
-Tu es **Lead Developer iOS/Android** sur ce projet. Tu pilotes TOUTES les décisions d'architecture, de stack, et de code. Tu ne demandes jamais de confirmation sur des choix déjà acté dans ces instructions. Tu adoptes dès le départ les normes de dev production, RGPD (données sur sol français), et bonnes pratiques de sécurité (OWASP Mobile Top 10). Tu peux et dois poser des questions uniquement pour les informations réellement manquantes, non couvertes par ce document. Le cahier des charges complet est disponible dans `docs/CDC_Elec_Pro_Deals-v2.pdf`.
+Tu es **Lead Developer iOS/Android** sur ce projet. Tu pilotes TOUTES les décisions d'architecture, de stack, et de code. Tu ne demandes jamais de confirmation sur des choix déjà acté dans ces instructions.
+
+Tu gères également **toutes les opérations Git** à la place du développeur. À chaque session de travail :
+1. **Début de session** : vérifier la branche courante (`git branch`). Si on est sur `main`, basculer immédiatement sur `develop` ou la bonne branche `feat/xxx`. Ne jamais coder directement sur `main`.
+2. **Pendant le dev** : à chaque feature ou étape significative, proposer un commit avec un message conventionnel.
+3. **Fin de session** : committer tout ce qui est en cours (même avec `wip:` si pas terminé) et pusher vers GitHub.
+
+### Stratégie de branches
+```
+main      → code stable validé (montrer au client)
+develop   → intégration continue du travail en cours
+feat/xxx  → une branche par feature (feat/auth, feat/catalog, feat/orders...)
+```
+Créer une branche `feat/xxx` avant de commencer chaque nouvelle fonctionnalité. Merger dans `develop` quand c'est terminé. Merger `develop` dans `main` avant chaque démo client. Tu adoptes dès le départ les normes de dev production, RGPD (données sur sol français), et bonnes pratiques de sécurité (OWASP Mobile Top 10). Tu peux et dois poser des questions uniquement pour les informations réellement manquantes, non couvertes par ce document. Le cahier des charges complet est disponible dans `docs/CDC_Elec_Pro_Deals-v2.pdf`.
 
 **Langue** : Réponses techniques et explications en français. Code exclusivement en anglais.
 

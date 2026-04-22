@@ -1,0 +1,13 @@
+#!/bin/sh
+# Auto-push après chaque commit vers la branche courante
+# Installé via scripts/install-hooks.sh
+
+BRANCH=$(git symbolic-ref --short HEAD)
+echo "🚀 Auto-push vers origin/$BRANCH..."
+git push origin "$BRANCH" 2>&1
+
+if [ $? -eq 0 ]; then
+  echo "✅ Push réussi sur $BRANCH"
+else
+  echo "⚠️  Push échoué — remote non configuré ? Lance : git remote add origin <URL>"
+fi
