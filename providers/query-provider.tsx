@@ -20,7 +20,7 @@ const persister = createSyncStoragePersister({
       storage.set(key, value);
     },
     removeItem: (key: string) => {
-      storage.remove(key);
+      storage.delete(key);
     },
   },
 });

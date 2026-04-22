@@ -1,4 +1,4 @@
-import { createMMKV } from 'react-native-mmkv';
+import { MMKV } from 'react-native-mmkv';
 
 interface KeyValueStorage {
   getItem: (name: string) => string | null;
@@ -6,8 +6,8 @@ interface KeyValueStorage {
   removeItem: (name: string) => void;
 }
 
-export const storage = createMMKV();
-export const encryptedStorage = createMMKV();
+export const storage = new MMKV();
+export const encryptedStorage = new MMKV({ id: 'encrypted-storage' });
 
 export const mmkvStorage: KeyValueStorage = {
   getItem: (name: string) => {
@@ -15,7 +15,7 @@ export const mmkvStorage: KeyValueStorage = {
     return value ?? null;
   },
   removeItem: (name: string) => {
-    storage.remove(name);
+    storage.delete(name);
   },
   setItem: (name: string, value: string) => {
     storage.set(name, value);
@@ -28,7 +28,7 @@ export const mmkvEncryptedStorage: KeyValueStorage = {
     return value ?? null;
   },
   removeItem: (name: string) => {
-    encryptedStorage.remove(name);
+    encryptedStorage.delete(name);
   },
   setItem: (name: string, value: string) => {
     encryptedStorage.set(name, value);
