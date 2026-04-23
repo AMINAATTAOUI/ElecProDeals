@@ -1,15 +1,25 @@
-export type StockStatus = 'available' | 'out_of_stock' | 'on_order';
+export type StockStatus = 'available' | 'low' | 'out_of_stock' | 'on_order';
+
+export interface ProductPricing {
+  productId: string;
+  publicPrice: number;
+  finalPrice: number;
+  discountPercent: number;
+  priceSheetId: string | null;
+}
 
 export interface Product {
   id: string;
-  reference: string;
+  sageRef: string;
   name: string;
   description: string;
+  category: string;
   publicPrice: number;
+  unit: string;
   stockStatus: StockStatus;
   estimatedDeliveryDays: number | null;
-  categoryId: string;
-  imageUrl: string | null;
+  isActive: boolean;
+  pricing?: ProductPricing;
 }
 
 export interface ProductCategory {

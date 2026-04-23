@@ -1,27 +1,20 @@
-import { View, Text, TextInput, FlatList, Pressable } from 'react-native';
+import { View, Text, TextInput, FlatList, Pressable, ActivityIndicator } from 'react-native';
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Package, Search } from 'lucide-react-native';
 import { useAppSelector } from '@/hooks/useAppStore';
+import { catalogService } from '@/services/catalog.service';
+import type { Product, StockStatus } from '@/types/product.types';
 
-// Mock products — remplacés par catalog.service.ts en Phase 4
-const MOCK_PRODUCTS = [
-  { id: '1', ref: 'SIE-5SL6-20', name: 'Disjoncteur 20A Siemens', category: 'Protection', price: 24.50, stock: 'available' as const },
-  { id: '2', ref: 'LEG-04704', name: 'Tableau électrique 13 modules', category: 'Tableau', price: 38.90, stock: 'available' as const },
-  { id: '3', ref: 'SCH-A9F74220', name: 'Disjoncteur iC60N 20A Schneider', category: 'Protection', price: 21.80, stock: 'low' as const },
-  { id: '4', ref: 'HAG-B16-030', name: 'Prise de courant 2P+T Hager', category: 'Appareillage', price: 4.20, stock: 'available' as const },
-  { id: '5', ref: 'SIE-5SL6-32', name: 'Disjoncteur 32A Siemens', category: 'Protection', price: 28.70, stock: 'unavailable' as const },
-  { id: '6', ref: 'LEG-07802', name: 'Interrupteur différentiel 40A 30mA', category: 'Protection', price: 67.30, stock: 'available' as const },
-] as const;
-
-type StockStatus = 'available' | 'low' | 'unavailable';
+const STOCK_CONFIG: Record<StockStatus, { label: string; bg: string; text: string }> = {
+  available: { label: 'En stock', bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-400' },
+  low: { label: 'Stock limité', bg: 'bg-amber-100 dark:bg-amber-900/30', text: 'text-amber-700 dark:text-amber-400' },
+  out_of_stock: { label: 'Rupture', bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-700 dark:text-red-400' },
+  on_order: { label: 'Sur commande', bg: 'bg-zinc-100 dark:bg-zinc-800', text: 'text-zinc-600 dark:text-zinc-400' },
+};
 
 function StockBadge({ status }: { status: StockStatus }) {
-  const config = {
-    available: { label: 'En stock', bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-400' },
-    low: { label: 'Stock limité', bg: 'bg-amber-100 dark:bg-amber-900/30', text: 'text-amber-700 dark:text-amber-400' },
-    unavailable: { label: 'Rupture', bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-700 dark:text-red-400' },
-  }[status];
-
+  const config = STOCK_CONFIG[status];
   return (
     <View className={`px-2 py-0.5 rounded-full ${config.bg}`}>
       <Text className={`text-xs font-medium ${config.text}`}>{config.label}</Text>
@@ -29,14 +22,55 @@ function StockBadge({ status }: { status: StockStatus }) {
   );
 }
 
+function ProductCard({ item }: { item: Product }) {
+  const displayPrice = item.pricing?.finalPrice ?? item.publicPrice;
+  const discount = item.pricing?.discountPercent;
+
+  return (
+    <Pressable className="bg-white dark:bg-zinc-900 rounded-xl p-4 border border-zinc-200 dark:border-zinc-800 active:opacity-80">
+      <View className="flex-row items-start justify-between">
+        <View className="flex-1 mr-3">
+          <Text className="text-xs text-zinc-400 dark:text-zinc-500 font-mono mb-0.5">
+            {item.sageRef}
+          </Text>
+          <Text className="text-sm font-semibold text-zinc-900 dark:text-white leading-snug">
+            {item.name}
+          </Text>
+          <Text className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+            {item.category} · {item.unit}
+          </Text>
+        </View>
+        <View className="items-end gap-y-1.5">
+          <View className="items-end">
+            <Text className="text-base font-bold text-blue-600 dark:text-blue-400">
+              {displayPrice.toFixed(2)} €
+            </Text>
+            {discount !== undefined && discount > 0 && (
+              <Text className="text-xs text-zinc-400 line-through">
+                {item.publicPrice.toFixed(2)} €
+              </Text>
+            )}
+          </View>
+          <StockBadge status={item.stockStatus} />
+        </View>
+      </View>
+    </Pressable>
+  );
+}
+
 export default function CatalogScreen() {
   const { user } = useAppSelector((s) => s.auth);
   const [search, setSearch] = useState('');
 
-  const filtered = MOCK_PRODUCTS.filter(
+  const { data: products, isLoading, isError, refetch } = useQuery({
+    queryKey: ['catalog', 'products'],
+    queryFn: () => catalogService.getProducts(),
+  });
+
+  const filtered = (products ?? []).filter(
     (p) =>
       p.name.toLowerCase().includes(search.toLowerCase()) ||
-      p.ref.toLowerCase().includes(search.toLowerCase()) ||
+      p.sageRef.toLowerCase().includes(search.toLowerCase()) ||
       p.category.toLowerCase().includes(search.toLowerCase()),
   );
 
@@ -62,41 +96,45 @@ export default function CatalogScreen() {
         </View>
       </View>
 
-      {/* Product list */}
-      <FlatList
-        data={filtered}
-        keyExtractor={(item) => item.id}
-        contentContainerClassName="p-4 gap-y-3"
-        renderItem={({ item }) => (
-          <Pressable className="bg-white dark:bg-zinc-900 rounded-xl p-4 border border-zinc-200 dark:border-zinc-800 active:opacity-80">
-            <View className="flex-row items-start justify-between">
-              <View className="flex-1 mr-3">
-                <Text className="text-xs text-zinc-400 dark:text-zinc-500 font-mono mb-0.5">
-                  {item.ref}
-                </Text>
-                <Text className="text-sm font-semibold text-zinc-900 dark:text-white leading-snug">
-                  {item.name}
-                </Text>
-                <Text className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                  {item.category}
-                </Text>
-              </View>
-              <View className="items-end gap-y-1.5">
-                <Text className="text-base font-bold text-blue-600 dark:text-blue-400">
-                  {item.price.toFixed(2)} €
-                </Text>
-                <StockBadge status={item.stock} />
-              </View>
-            </View>
+      {/* States */}
+      {isLoading && (
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator size="large" color="#2563eb" />
+          <Text className="text-zinc-400 mt-3 text-sm">Chargement du catalogue...</Text>
+        </View>
+      )}
+
+      {isError && (
+        <View className="flex-1 items-center justify-center px-8">
+          <Package size={40} className="text-zinc-300" strokeWidth={1.5} />
+          <Text className="text-zinc-500 dark:text-zinc-400 mt-3 text-sm text-center">
+            Impossible de charger le catalogue.{'\n'}Vérifiez votre connexion.
+          </Text>
+          <Pressable
+            className="mt-4 px-6 py-2.5 rounded-xl bg-blue-600 active:bg-blue-700"
+            onPress={() => void refetch()}
+          >
+            <Text className="text-white font-medium text-sm">Réessayer</Text>
           </Pressable>
-        )}
-        ListEmptyComponent={
-          <View className="items-center mt-16">
-            <Package size={40} className="text-zinc-300" strokeWidth={1.5} />
-            <Text className="text-zinc-400 mt-3 text-sm">Aucun produit trouvé</Text>
-          </View>
-        }
-      />
+        </View>
+      )}
+
+      {/* Product list */}
+      {!isLoading && !isError && (
+        <FlatList
+          data={filtered}
+          keyExtractor={(item) => item.id}
+          contentContainerClassName="p-4 gap-y-3"
+          renderItem={({ item }) => <ProductCard item={item} />}
+          ListEmptyComponent={
+            <View className="items-center mt-16">
+              <Package size={40} className="text-zinc-300" strokeWidth={1.5} />
+              <Text className="text-zinc-400 mt-3 text-sm">Aucun produit trouvé</Text>
+            </View>
+          }
+        />
+      )}
     </View>
   );
 }
+

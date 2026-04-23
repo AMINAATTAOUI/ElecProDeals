@@ -1,35 +1,13 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { View, Text, KeyboardAvoidingView, Platform, ScrollView, Pressable, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import type { Href } from 'expo-router';
+import axios from 'axios';
 import { Zap, Mail, Lock, Eye, EyeOff } from 'lucide-react-native';
 import { Input } from '@/components/ui/input';
 import { useAppDispatch } from '@/hooks/useAppStore';
 import { setCredentials } from '@/stores/auth.slice';
-import type { AuthUser, UserRole } from '@/types/user.types';
-
-// ─── Mock Auth ─────────────────────────────────────────────────────────────────
-// POC: simule une connexion. Remplacé par auth.service.ts en Phase 3.
-function mockAuthenticate(email: string): { user: AuthUser; accessToken: string } | null {
-  if (!email.trim()) return null;
-
-  let role: UserRole = 'client';
-  if (email.includes('admin')) role = 'admin';
-  else if (email.includes('commercial')) role = 'commercial';
-
-  const user: AuthUser = {
-    id: `mock-${role}-001`,
-    email: email.toLowerCase().trim(),
-    role,
-    firstName: role === 'admin' ? 'Admin' : role === 'commercial' ? 'Marie' : 'Jean',
-    lastName: role === 'admin' ? 'Système' : role === 'commercial' ? 'Dupont' : 'Martin',
-    companyName: role === 'client' ? 'Martin Électricité SARL' : 'ElecProDeals',
-    siret: '12345678901234',
-  };
-
-  return { user, accessToken: 'mock-access-token-dev' };
-}
-// ───────────────────────────────────────────────────────────────────────────────
+import { authService } from '@/services/auth.service';
 
 export default function LoginScreen() {
   const dispatch = useAppDispatch();
@@ -41,7 +19,7 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  function handleLogin() {
+  async function handleLogin() {
     setError(null);
     if (!email.trim() || !password.trim()) {
       setError('Veuillez renseigner votre email et mot de passe.');
@@ -49,19 +27,10 @@ export default function LoginScreen() {
     }
 
     setLoading(true);
+    try {
+      const result = await authService.login(email.trim().toLowerCase(), password);
+      dispatch(setCredentials({ user: result.user, accessToken: result.accessToken }));
 
-    // Simulate network delay
-    setTimeout(() => {
-      const result = mockAuthenticate(email);
-      if (!result) {
-        setError('Identifiants incorrects.');
-        setLoading(false);
-        return;
-      }
-
-      dispatch(setCredentials(result));
-
-      // Expo Router will pick up the Redux state change via app/index.tsx
       switch (result.user.role) {
         case 'admin':
           router.replace('/(admin)' as Href);
@@ -72,9 +41,15 @@ export default function LoginScreen() {
         default:
           router.replace('/(client)/catalog' as Href);
       }
-
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response?.status === 401) {
+        setError('Email ou mot de passe incorrect.');
+      } else {
+        setError('Impossible de se connecter. Verifiez votre connexion reseau.');
+      }
+    } finally {
       setLoading(false);
-    }, 800);
+    }
   }
 
   return (
@@ -86,7 +61,6 @@ export default function LoginScreen() {
         contentContainerClassName="flex-grow justify-center px-6 py-12"
         keyboardShouldPersistTaps="handled"
       >
-        {/* Logo */}
         <View className="items-center mb-10">
           <View className="w-16 h-16 rounded-2xl bg-blue-600 items-center justify-center mb-4">
             <Zap className="text-white" size={32} strokeWidth={2.5} />
@@ -99,7 +73,6 @@ export default function LoginScreen() {
           </Text>
         </View>
 
-        {/* Form */}
         <View className="gap-y-4">
           <View>
             <Text className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
@@ -132,7 +105,7 @@ export default function LoginScreen() {
               <Input
                 value={password}
                 onChangeText={setPassword}
-                placeholder="••••••••"
+                placeholder="........"
                 secureTextEntry={!showPassword}
                 className="pl-10 pr-10"
               />
@@ -155,7 +128,7 @@ export default function LoginScreen() {
 
           <Pressable
             className="mt-2 h-12 rounded-xl bg-blue-600 active:bg-blue-700 items-center justify-center"
-            onPress={handleLogin}
+            onPress={() => { void handleLogin(); }}
             disabled={loading}
           >
             {loading
@@ -165,19 +138,17 @@ export default function LoginScreen() {
           </Pressable>
         </View>
 
-        {/* Demo hint */}
         <View className="mt-8 p-4 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900">
           <Text className="text-xs font-semibold text-blue-700 dark:text-blue-400 mb-1">
-            Mode démo — accès de test
+            Mode demo
           </Text>
           <Text className="text-xs text-blue-600 dark:text-blue-500">
-            client@demo.fr → espace client{'\n'}
-            commercial@demo.fr → espace commercial{'\n'}
-            admin@demo.fr → espace admin
+            client@demo.fr / password123{'\n'}
+            commercial@demo.fr / password123{'\n'}
+            admin@demo.fr / password123
           </Text>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
-
