@@ -1,0 +1,3 @@
+// Placeholder — composants partagés multi-rôles (Header, LoadingSpinner, ErrorBoundary...)
+// Implémentation au fil des phases
+export {};

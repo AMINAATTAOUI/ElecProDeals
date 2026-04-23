@@ -1,0 +1,3 @@
+// Placeholder — composants UI génériques (Button, Card, Input, Badge...)
+// Sera rempli lors de l'import du UI Kit (expo-nativewind-template)
+export {};

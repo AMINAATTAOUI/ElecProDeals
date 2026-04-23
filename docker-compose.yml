@@ -1,0 +1,18 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: elecprodeals-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: elecpro
+      POSTGRES_PASSWORD: elecpro_dev_2026
+      POSTGRES_DB: elecprodeals
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
