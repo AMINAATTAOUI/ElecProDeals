@@ -16,7 +16,7 @@ export class AuthService {
   ) {}
 
   async login(email: string, password: string): Promise<AuthTokens & { user: object }> {
-    const user = this.usersService.findByEmail(email);
+    const user = await this.usersService.findByEmail(email);
 
     if (!user || !user.isActive) {
       throw new UnauthorizedException('Identifiants incorrects');
@@ -46,7 +46,7 @@ export class AuthService {
       throw new ForbiddenException('Refresh token invalide ou expiré');
     }
 
-    const user = this.usersService.findById(payload.sub);
+    const user = await this.usersService.findById(payload.sub);
     if (!user || !user.isActive) {
       throw new ForbiddenException('Accès refusé');
     }

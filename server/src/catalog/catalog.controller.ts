@@ -1,8 +1,8 @@
-import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
+﻿import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { CatalogService } from './catalog.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
-import type { JwtPayload, ClientUser } from '../types/user.types';
+import type { JwtPayload } from '../types/user.types';
 import { UsersService } from '../users/users.service';
 
 @Controller('catalog')
@@ -14,13 +14,13 @@ export class CatalogController {
   ) {}
 
   @Get('products')
-  getProducts(
+  async getProducts(
     @CurrentUser() jwtUser: JwtPayload,
     @Query('q') query?: string,
   ) {
-    const user = this.usersService.findById(jwtUser.sub);
+    const user = await this.usersService.findById(jwtUser.sub);
     const customerType =
-      user?.role === 'client' ? (user as ClientUser).customerType : undefined;
+      user?.role === 'client' ? user.customerType ?? undefined : undefined;
 
     if (query) {
       return this.catalogService.searchProducts(query, customerType);
@@ -30,15 +30,14 @@ export class CatalogController {
   }
 
   @Get('products/:id')
-  getProductById(
+  async getProductById(
     @Param('id') id: string,
     @CurrentUser() jwtUser: JwtPayload,
   ) {
-    const user = this.usersService.findById(jwtUser.sub);
+    const user = await this.usersService.findById(jwtUser.sub);
     const customerType =
-      user?.role === 'client' ? (user as ClientUser).customerType : undefined;
+      user?.role === 'client' ? user.customerType ?? undefined : undefined;
 
     return this.catalogService.getProductById(id, customerType);
   }
 }
-
