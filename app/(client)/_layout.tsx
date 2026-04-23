@@ -31,7 +31,7 @@ export default function ClientLayout() {
       }}
     >
       <Tabs.Screen
-        name="catalog"
+        name="catalog/index"
         options={{
           title: 'Catalogue',
           tabBarIcon: ({ color, size }) => (
@@ -40,7 +40,7 @@ export default function ClientLayout() {
         }}
       />
       <Tabs.Screen
-        name="orders"
+        name="orders/index"
         options={{
           title: 'Commandes',
           tabBarIcon: ({ color, size }) => (
@@ -49,7 +49,7 @@ export default function ClientLayout() {
         }}
       />
       <Tabs.Screen
-        name="invoices"
+        name="invoices/index"
         options={{
           title: 'Factures',
           tabBarIcon: ({ color, size }) => (
@@ -58,7 +58,7 @@ export default function ClientLayout() {
         }}
       />
       <Tabs.Screen
-        name="account"
+        name="account/index"
         options={{
           title: 'Compte',
           tabBarIcon: ({ color, size }) => (

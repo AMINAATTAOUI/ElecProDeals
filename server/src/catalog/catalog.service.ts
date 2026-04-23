@@ -4,7 +4,14 @@ import { ProductEntity } from '../database/entities/product.entity';
 import type { ComputedPrice } from '../types/pricing.types';
 import type { CustomerType } from '../types/user.types';
 
-type ProductWithPricing = ProductEntity & { pricing?: ComputedPrice };
+type ProductWithPricing = Omit<ProductEntity, 'publicPrice'> & {
+  publicPrice: number;
+  pricing?: ComputedPrice;
+};
+
+function normalizeProduct(p: ProductEntity): Omit<ProductEntity, 'publicPrice'> & { publicPrice: number } {
+  return { ...p, publicPrice: Number(p.publicPrice) };
+}
 
 @Injectable()
 export class CatalogService {
@@ -14,11 +21,11 @@ export class CatalogService {
     const products = await this.sageService.getProducts();
 
     if (!customerType) {
-      return products;
+      return products.map(normalizeProduct);
     }
 
     return products.map((product) => ({
-      ...product,
+      ...normalizeProduct(product),
       pricing: this.sageService.computePrice(product, customerType),
     }));
   }
@@ -34,11 +41,11 @@ export class CatalogService {
     }
 
     if (!customerType) {
-      return product;
+      return normalizeProduct(product);
     }
 
     return {
-      ...product,
+      ...normalizeProduct(product),
       pricing: this.sageService.computePrice(product, customerType),
     };
   }
@@ -50,11 +57,11 @@ export class CatalogService {
     const products = await this.sageService.searchProducts(query);
 
     if (!customerType) {
-      return products;
+      return products.map(normalizeProduct);
     }
 
     return products.map((product) => ({
-      ...product,
+      ...normalizeProduct(product),
       pricing: this.sageService.computePrice(product, customerType),
     }));
   }
