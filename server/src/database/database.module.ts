@@ -3,6 +3,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserEntity } from './entities/user.entity';
 import { ProductEntity } from './entities/product.entity';
+import { OrderEntity } from './entities/order.entity';
+import { OrderItemEntity } from './entities/order-item.entity';
 
 @Module({
   imports: [
@@ -16,7 +18,7 @@ import { ProductEntity } from './entities/product.entity';
         username: config.get<string>('DATABASE_USER', 'elecpro'),
         password: config.get<string>('DATABASE_PASSWORD'),
         database: config.get<string>('DATABASE_NAME', 'elecprodeals'),
-        entities: [UserEntity, ProductEntity],
+        entities: [UserEntity, ProductEntity, OrderEntity, OrderItemEntity],
         synchronize: config.get<string>('NODE_ENV') !== 'production',
         logging: config.get<string>('NODE_ENV') === 'development',
         ssl: config.get<string>('NODE_ENV') === 'production'
