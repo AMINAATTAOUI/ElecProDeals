@@ -10,6 +10,11 @@ export class UsersService {
     private readonly usersRepo: Repository<UserEntity>,
   ) {}
 
+  async findAll(): Promise<Omit<UserEntity, 'passwordHash'>[]> {
+    const users = await this.usersRepo.find({ order: { createdAt: 'DESC' } });
+    return users.map((u) => this.toPublicProfile(u));
+  }
+
   async findByEmail(email: string): Promise<UserEntity | null> {
     return this.usersRepo.findOne({
       where: { email: email.toLowerCase().trim(), isActive: true },
