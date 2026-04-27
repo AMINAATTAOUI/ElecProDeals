@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
   ShoppingCart,
@@ -22,6 +22,13 @@ const NAV_ITEMS = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  function handleLogout() {
+    localStorage.removeItem('admin_token');
+    document.cookie = 'admin_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Strict';
+    router.push('/login');
+  }
 
   return (
     <aside className="w-60 flex-shrink-0 bg-zinc-900 border-r border-zinc-800 flex flex-col h-full">
@@ -59,7 +66,10 @@ export function Sidebar() {
 
       {/* Footer */}
       <div className="px-3 py-4 border-t border-zinc-800">
-        <button className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors w-full">
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors w-full"
+        >
           <LogOut size={16} strokeWidth={1.8} />
           Déconnexion
         </button>
