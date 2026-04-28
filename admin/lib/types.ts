@@ -3,6 +3,17 @@ export type PaymentMethod = 'deferred' | 'card';
 export type UserRole = 'client' | 'commercial' | 'admin';
 export type CustomerType = 'artisan' | 'large_installer' | 'wholesaler';
 export type StockStatus = 'available' | 'low' | 'out_of_stock' | 'on_order';
+export type NotificationStatus = 'sent' | 'failed';
+
+export interface Notification {
+  id: string;
+  title: string;
+  body: string;
+  targetClientId: string | null;
+  sentById: string;
+  status: NotificationStatus;
+  sentAt: string;
+}
 export type PricingRuleOperator = 'multiply' | 'add' | 'subtract' | 'fixed';
 export type InvoiceStatus = 'paid' | 'unpaid' | 'overdue';
 export type QuoteStatus = 'pending' | 'accepted' | 'refused' | 'expired';
