@@ -31,10 +31,10 @@ export default function LoginPage() {
         return;
       }
 
-      const data = (await res.json()) as { access_token: string };
-      localStorage.setItem('admin_token', data.access_token);
+      const data = (await res.json()) as { accessToken: string };
+      localStorage.setItem('admin_token', data.accessToken);
       // Cookie pour le middleware (route protection)
-      document.cookie = `admin_token=${data.access_token}; path=/; SameSite=Strict`;
+      document.cookie = `admin_token=${data.accessToken}; path=/; SameSite=Strict`;
       router.push('/dashboard');
     } catch {
       setError('Connexion au serveur impossible');
