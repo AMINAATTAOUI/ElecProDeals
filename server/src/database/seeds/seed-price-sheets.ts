@@ -21,17 +21,17 @@ export async function seedPriceSheets(dataSource: DataSource): Promise<void> {
     {
       name: 'Artisans & Installateurs Standard',
       appliesTo: 'artisan',
-      rule: { operator: 'multiply', value: 0.82, description: 'Remise 18% sur prix public' },
+      rule: { operator: 'multiply', value: 1.0, description: 'À configurer — tarif artisan (×1.0 = prix public)' },
     },
     {
       name: 'Gros Installateurs',
       appliesTo: 'large_installer',
-      rule: { operator: 'multiply', value: 0.72, description: 'Remise 28% sur prix public' },
+      rule: { operator: 'multiply', value: 1.0, description: 'À configurer — tarif gros installateur (×1.0 = prix public)' },
     },
     {
       name: 'Grossistes',
       appliesTo: 'wholesaler',
-      rule: { operator: 'multiply', value: 0.60, description: 'Remise 40% sur prix public' },
+      rule: { operator: 'multiply', value: 1.0, description: 'À configurer — tarif grossiste (×1.0 = prix public)' },
     },
   ];
 
