@@ -11,6 +11,7 @@ import {
   LogOut,
   Zap,
   Tag,
+  FileText,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -19,6 +20,7 @@ const NAV_ITEMS = [
   { href: '/clients', label: 'Clients', icon: Users },
   { href: '/catalog', label: 'Catalogue', icon: Package },
   { href: '/pricing', label: 'Feuilles de prix', icon: Tag },
+  { href: '/invoices', label: 'Devis & Factures', icon: FileText },
   { href: '/notifications', label: 'Notifications', icon: Bell },
 ];
 

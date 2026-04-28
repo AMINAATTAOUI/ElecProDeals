@@ -7,6 +7,7 @@ import { SageModule } from './sage/sage.module';
 import { CatalogModule } from './catalog/catalog.module';
 import { OrdersModule } from './orders/orders.module';
 import { PricingModule } from './pricing/pricing.module';
+import { InvoicesModule } from './invoices/invoices.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { PricingModule } from './pricing/pricing.module';
     CatalogModule,
     OrdersModule,
     PricingModule,
+    InvoicesModule,
   ],
 })
 export class AppModule {}
