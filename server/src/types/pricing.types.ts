@@ -6,17 +6,16 @@ export interface PricingRule {
   id: string;
   operator: PricingRuleOperator;
   value: number;
-  description?: string;
+  description?: string | null;
+  sortOrder: number;
 }
 
 export interface PriceSheet {
   id: string;
   name: string;
   rules: PricingRule[];
-  /** Applies to all clients of this customer type */
-  appliesTo: CustomerType;
-  /** Optional overrides for specific client IDs */
-  clientOverrides?: string[];
+  /** null = feuille individuelle */
+  appliesTo: CustomerType | null;
   isActive: boolean;
 }
 

@@ -1,8 +1,27 @@
 export type OrderStatus = 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
 export type PaymentMethod = 'deferred' | 'card';
 export type UserRole = 'client' | 'commercial' | 'admin';
-export type CustomerType = 'standard' | 'large_installer' | 'wholesaler';
+export type CustomerType = 'artisan' | 'large_installer' | 'wholesaler';
 export type StockStatus = 'available' | 'low' | 'out_of_stock' | 'on_order';
+export type PricingRuleOperator = 'multiply' | 'add' | 'subtract' | 'fixed';
+
+export interface PricingRule {
+  id: string;
+  operator: PricingRuleOperator;
+  value: number;
+  description: string | null;
+  sortOrder: number;
+}
+
+export interface PriceSheet {
+  id: string;
+  name: string;
+  appliesTo: CustomerType | null;
+  isActive: boolean;
+  rules: PricingRule[];
+  createdAt: string;
+  updatedAt: string;
+}
 
 export interface User {
   id: string;

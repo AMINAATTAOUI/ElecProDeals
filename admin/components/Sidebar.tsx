@@ -10,6 +10,7 @@ import {
   Bell,
   LogOut,
   Zap,
+  Tag,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -17,6 +18,7 @@ const NAV_ITEMS = [
   { href: '/orders', label: 'Commandes', icon: ShoppingCart },
   { href: '/clients', label: 'Clients', icon: Users },
   { href: '/catalog', label: 'Catalogue', icon: Package },
+  { href: '/pricing', label: 'Feuilles de prix', icon: Tag },
   { href: '/notifications', label: 'Notifications', icon: Bell },
 ];
 
