@@ -6,8 +6,8 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { OrderItemEntity } from './order-item.entity';
 import type { OrderStatus, PaymentMethod } from '../../types/order.types';
+import { OrderItemEntity } from './order-item.entity';
 
 @Entity('orders')
 export class OrderEntity {

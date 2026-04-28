@@ -1,9 +1,8 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
-  turbopack: {
-    root: process.env['npm_config_local_prefix'] ?? process.cwd(),
-  },
+  outputFileTracingRoot: path.join(__dirname, ".."),
 };
 
 export default nextConfig;
