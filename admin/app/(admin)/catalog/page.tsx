@@ -1,18 +1,21 @@
 'use client';
 
+import React from 'react';
 import { useState, useEffect } from 'react';
 import { Product } from '@/lib/types';
 import { apiFetch } from '@/lib/api';
 import { CheckCircle, XCircle, Clock, AlertCircle } from 'lucide-react';
 
-const STOCK_LABELS = {
-  in_stock: 'En stock',
+const STOCK_LABELS: Record<string, string> = {
+  available: 'Disponible',
+  low: 'Stock faible',
   out_of_stock: 'Rupture',
   on_order: 'Sur commande',
 };
 
-const STOCK_ICONS = {
-  in_stock: <CheckCircle size={16} className="text-green-500" />,
+const STOCK_ICONS: Record<string, React.ReactNode> = {
+  available: <CheckCircle size={16} className="text-green-500" />,
+  low: <AlertCircle size={16} className="text-orange-400" />,
   out_of_stock: <XCircle size={16} className="text-red-500" />,
   on_order: <Clock size={16} className="text-yellow-500" />,
 };
