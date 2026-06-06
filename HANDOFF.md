@@ -1,5 +1,5 @@
 # ElecProDeals — Handoff Document
-*Généré le 6 juin 2026 — à lire par tout agent IA prenant le relai sur ce projet*
+*Mise à jour le 6 juin 2026 — Sprint 0 foundations terminé — à lire par tout agent IA prenant le relai sur ce projet*
 
 ---
 
@@ -21,9 +21,10 @@
 - OWASP Mobile Top 10 respecté
 
 **Git :**
-- Branche active : `feat/backoffice`
-- Dernier commit : `36dbd99` — `fix: OWASP - remove JWT secret fallbacks, add Zod validation on login`
+- Branche active : `develop` (merge `feat/backoffice → develop` effectué ✅)
+- Dernier commit : `a797461` — `chore: update CLAUDE.md v3 — post-merge, structure audit, workflows`
 - Stratégie : `main` (stable) → `develop` → `feat/xxx`
+- `CLAUDE.md v3` en place — source de vérité absolue pour tous les agents IA ✅
 
 **Credentials de test (seeder) :**
 - `admin@demo.fr` / `password123`
@@ -296,19 +297,53 @@ cd server ; npx ts-node src/database/seed.ts
 
 ---
 
-## 10. Prochaine session — ordre recommandé
+## 10. Sprint 0 — Foundations (TERMINÉ ✅)
 
-1. **`feat/commercial`** — nouvelle branche
-2. Backend : `GET /users/my-clients` + `POST /orders/for-client`
-3. Mobile : 3 écrans commercial (clients → catalogue → confirmation)
-4. Backend : `PATCH /orders/:id/status` pour l'admin
-5. Backoffice : bouton "Mettre à jour statut" sur la page orders
-6. Tests DTOs + guards
-7. Merge `feat/backoffice` + `feat/commercial` → `develop` → `main`
-8. **Démo client**
+| Étape | Commit | Statut |
+|-------|--------|---------|
+| Merge `feat/backoffice → develop` (83 fichiers, 10 modules NestJS, 7 pages admin) | `814d0de` | ✅ |
+| CLAUDE.md v3 — constitution projet à jour | `a797461` | ✅ |
+| `react-native-mmkv` v4.3.1 + `nitro-modules` 0.35.9 | `a4f87a0` | ✅ |
+| `react-test-renderer` 19.1.0 aligné React 19 | `ace061b` | ✅ |
+| Suppression `passport-local` (unused) | `fdce6a6` | ✅ |
+| TypeScript 0 erreur — mobile + backend + admin | — | ✅ |
 
 ---
 
-*Dernière mise à jour : 6 juin 2026*
+## 11. Prochaine session — ordre recommandé
+
+### 🔴 Sprint 1 — CI/CD (priorité immédiate)
+
+1. **CI/CD GitHub Actions** — pipeline `develop` → lint + tsc + tests
+   - Fichier : `.github/workflows/ci.yml`
+   - Jobs : `tsc --noEmit` sur les 3 couches, `npm run test` backend
+   - Déclencheur : push sur `develop` et `feat/*`
+
+2. **`PATCH /orders/:id/status`** — backend bloquant démo
+   - `server/src/orders/orders.controller.ts` + `orders.service.ts`
+   - Guard : `ADMIN` et `COMMERCIAL` uniquement
+   - Statuts : `pending → confirmed → shipped → delivered`
+
+3. **Sécurité admin localStorage → httpOnly cookie**
+   - Route Next.js `/api/auth/session`
+   - Remplacer `localStorage.setItem('admin_token', ...)` partout dans `admin/`
+
+### 🟠 Sprint 1 — suite
+
+4. `@nestjs/throttler` sur `POST /auth/login` (max 5 req/min)
+5. `helmet()` dans `server/src/main.ts`
+6. Dashboard stats branchées BDD (remplacer les 4 valeurs statiques)
+7. Créer `users.controller.ts` (extraire routes de `users.service.ts`)
+
+### 🟡 Phase 3 — après feedback client
+
+8. **`feat/commercial`** — nouvelle branche, 3 écrans mobile
+9. Backend : `GET /users/my-clients` + `POST /orders/for-client`
+10. Tests DTOs + guards (pricing, SageService, roles.guard)
+11. Merge `develop → main` avant démo client
+
+---
+
+*Dernière mise à jour : 6 juin 2026 — Sprint 0 foundations complet*
 *Référence CDC : `docs/CDC_Elec_Pro_Deals-v2.pdf`*
-*Architecture : `PROJECT.md` (désynchronisé — se fier à ce document)*
+*Source de vérité : `CLAUDE.md` v3 (remplace PROJECT.md désynchronisé)*
