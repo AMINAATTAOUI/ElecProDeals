@@ -26,7 +26,7 @@ export default function DashboardPage() {
     <div>
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-zinc-100">Dashboard</h1>
-        <p className="text-zinc-400 mt-1">Vue d'ensemble de votre activité</p>
+        <p className="text-zinc-400 mt-1">Vue d&apos;ensemble de votre activité</p>
       </div>
 
       {/* Stats Grid */}

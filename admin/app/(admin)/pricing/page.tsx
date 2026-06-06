@@ -82,6 +82,7 @@ export default function PricingPage() {
   }, [token]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- loadSheets manages its own loading state
     void loadSheets();
   }, [loadSheets]);
 
@@ -180,7 +181,11 @@ export default function PricingPage() {
   function toggleExpanded(id: string) {
     setExpanded((prev) => {
       const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
       return next;
     });
   }

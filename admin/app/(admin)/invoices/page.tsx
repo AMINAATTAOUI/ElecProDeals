@@ -51,6 +51,7 @@ export default function InvoicesPage() {
     typeof window !== 'undefined' ? (localStorage.getItem('admin_token') ?? '') : '';
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- loading reset is intentional before async fetch
     setLoading(true);
     setError(null);
     const endpoint = activeTab === 'invoices' ? '/invoices' : '/invoices/quotes';
@@ -148,7 +149,7 @@ export default function InvoicesPage() {
                 <th className="text-left px-4 py-3">Référence</th>
                 <th className="text-left px-4 py-3">Client</th>
                 <th className="text-left px-4 py-3">Émis le</th>
-                <th className="text-left px-4 py-3">Valide jusqu'au</th>
+                <th className="text-left px-4 py-3">Valide jusqu&apos;au</th>
                 <th className="text-right px-4 py-3">Total HT</th>
                 <th className="text-right px-4 py-3">Statut</th>
               </tr>
