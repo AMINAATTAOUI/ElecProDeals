@@ -1,7 +1,7 @@
 # CLAUDE.md — ElecProDeals
 > Lu automatiquement à chaque session Claude Code.
 > Source de vérité absolue — toute décision d'architecture passe par Claude.ai Project "ElecProDeals".
-> Version : 2.0 — mise à jour post-handoff 6 juin 2026
+> Version : 3.0 — post-merge feat/backoffice + audit structure + workflows & standards — Juin 2026
 
 ---
 
@@ -10,9 +10,10 @@
 Tu es **Lead Developer iOS/Android** sur ElecProDeals.
 - Tu appliques les conventions production et RGPD **sur chaque ligne de code**, pas après.
 - Tu codes en **TypeScript strict** partout. Zéro `any`, zéro `@ts-ignore`, zéro secret hardcodé.
-- Tu ne changes jamais une dépendance, une lib, ou un pattern architectural sans que ce soit listé ici ou demandé explicitement.
-- Si une information manque pour implémenter correctement → tu la demandes avant de coder.
-- Tu ne proposes jamais `moment.js`, `lodash`, `formik`, `@react-native-firebase/*`, `react-native-paper` — ces packages sont bannis de ce projet.
+- Tu ne changes jamais une dépendance sans que ce soit listé ici ou demandé explicitement.
+- Si une information manque → tu la demandes avant de coder.
+- Tu commites à chaque étape significative — jamais tout en un seul commit.
+- Tu ne proposes jamais : `moment.js`, `lodash`, `formik`, `@react-native-firebase/*`, `react-native-paper` — bannis.
 
 ---
 
@@ -21,19 +22,15 @@ Tu es **Lead Developer iOS/Android** sur ElecProDeals.
 **Nom :** ElecProDeals
 **Type :** Application mobile B2B e-commerce
 **Utilisateurs cibles :** Artisans, installateurs, grossistes (clients professionnels)
+**Priorité client :** App installable depuis App Store + Google Play — commande autonome client pro en premier
 **Cahier des charges complet :** `docs/CDC_Elec_Pro_Deals-v2.pdf`
-
-### Objectifs métier
-- Permettre aux clients pro de commander en autonomie (sans appeler le commercial)
-- Synchronisation bidirectionnelle avec Sage 100 cloud (commandes, devis, factures)
-- Vente terrain : les commerciaux commandent pour le compte de leurs clients via l'app
 
 ### 3 rôles utilisateur
 ```typescript
 enum UserRole {
-  CLIENT_PRO  = 'CLIENT_PRO',   // Artisan / Installateur / Grossiste
-  COMMERCIAL  = 'COMMERCIAL',   // Commercial terrain
-  ADMIN       = 'ADMIN',        // Administrateur backoffice
+  CLIENT_PRO  = 'CLIENT_PRO',   // Priorité 1 — parcours complet implémenté
+  COMMERCIAL  = 'COMMERCIAL',   // Priorité 3 — après validation client
+  ADMIN       = 'ADMIN',        // Backoffice web Next.js
 }
 
 enum CustomerTypology {
@@ -47,28 +44,26 @@ enum CustomerTypology {
 
 ## 3. Stack technique — IMMUABLE
 
-Ne jamais proposer de changer ces choix sans validation sur Claude.ai.
-
 | Couche | Technologie | Version |
 |--------|-------------|---------|
 | Mobile | React Native + Expo SDK managed | 54.0.31 |
 | Router | Expo Router (file-based) | 6.0.14 |
 | Styling mobile | NativeWind (TailwindCSS v3) | 4.1.23 |
 | State global | Redux Toolkit | ^2.11.2 |
-| Server state | TanStack Query (React Query) | 5.90.7 |
-| Storage local | react-native-mmkv | v4.x (voir §8) |
+| Server state | TanStack Query | 5.90.7 |
+| Storage local | react-native-mmkv | v4.x (voir §9) |
 | Réseau | Axios | ^1.15.2 |
 | Validation mobile | Zod v4 | ^4.3.6 |
 | Animations | react-native-reanimated | 4.1.1 |
 | Backend | NestJS + TypeScript strict | ^11.0.1 |
 | ORM | TypeORM | ^0.3.28 |
-| Base de données | PostgreSQL (OVH France) | — |
+| Base de données | PostgreSQL (local Docker dev) | — |
 | Auth | JWT 15min / Refresh 7j (rotation) | — |
 | Paiement | Stripe — Phase 2 uniquement | désactivé |
 | Notifications | expo-notifications (FCM/APNs) | ^55.0.20 |
 | Backoffice | Next.js App Router | 16.2.4 |
 | Styling admin | TailwindCSS v4 | ^4 |
-| Hébergement | OVH VPS France (RGPD) | — |
+| Hébergement | OVH VPS France — après validation client | — |
 
 ### ⚠️ Tailwind — coexistence de versions
 - **Mobile** : TailwindCSS **v3** via NativeWind → config `tailwind.config.js`
@@ -79,11 +74,8 @@ Ne jamais proposer de changer ces choix sans validation sur Claude.ai.
 
 ## 4. État d'avancement — ce qui est FAIT
 
-### Backend NestJS ✅ Complet
-Tous les modules sont implémentés et fonctionnels :
-`auth` · `users` · `catalog` · `orders` · `pricing` · `invoices` · `notifications` · `sage` · `stripe` (mocké) · `admin`
-
-Endpoints disponibles — voir `docs/API.md` pour le détail complet.
+### Backend NestJS ✅ Complet (après merge feat/backoffice)
+Modules implémentés : `auth` · `users` · `catalog` · `orders` · `pricing` · `invoices` · `notifications` · `sage` · `stripe` (mocké) · `admin`
 
 ### Mobile React Native ✅ Complet (sauf rôle commercial)
 | Route | État |
@@ -94,138 +86,70 @@ Endpoints disponibles — voir `docs/API.md` pour le détail complet.
 | `/(client)/invoices` | ✅ Devis & factures mock Sage |
 | `/(client)/notifications` | ✅ Liste depuis BDD |
 | `/(client)/account` | ✅ Profil, déconnexion |
-| `/(commercial)` | ⚠️ **STUB — à implémenter** |
+| `/(commercial)` | ⚠️ STUB — Phase 3 selon feedback client |
 
 ### Backoffice Next.js ✅ Complet
-7 pages fonctionnelles : `dashboard` · `clients` · `catalog` · `pricing` · `orders` · `invoices` · `notifications`
-
-**⚠️ Point de sécurité ouvert :** le token admin est stocké en `localStorage` → doit migrer vers `httpOnly` cookie via `/api/auth/session` (Next.js route API). À faire avant livraison prod.
+7 pages : `dashboard` · `clients` · `catalog` · `pricing` · `orders` · `invoices` · `notifications`
 
 ---
 
-## 5. Ce qui RESTE à implémenter
+## 5. Ce qui RESTE à implémenter — dans l'ordre
 
-### 🔴 Bloquant démo client
+### 🔴 Sprint 1 — Bloquant démo
 
-#### A. Rôle commercial — mobile
-**Branche à créer :** `feat/commercial`
+**A. PATCH /orders/:id/status**
+- Fichiers : `server/src/orders/orders.controller.ts` + `orders.service.ts`
+- Statuts : `pending → confirmed → shipped → delivered`
+- Guard : `ADMIN` et `COMMERCIAL` uniquement
 
-Backend à ajouter dans `server/src/` :
-```
-GET  /users/my-clients      → clients où assignedCommercialId = user.sub
-POST /orders/for-client     → createOrder avec clientId en body (COMMERCIAL uniquement)
-```
+**B. Sécurité admin — localStorage → httpOnly cookie**
+- Migrer `admin_token` vers cookie `httpOnly` via Next.js route `/api/auth/session`
 
-Écrans à créer dans `app/(commercial)/` :
-1. `clients/index.tsx` — liste des clients du portefeuille
-2. `catalog/index.tsx` — catalogue avec contexte client sélectionné (prix du client)
-3. `order/confirm.tsx` — confirmation commande au nom du client
+**C. Rate limiting**
+- `@nestjs/throttler` sur `POST /auth/login` — max 5 tentatives/minute
 
-#### B. PATCH /orders/:id/status
-Fichiers : `server/src/orders/orders.controller.ts` + `orders.service.ts`
-Statuts : `pending → confirmed → shipped → delivered`
-Guard : `ADMIN` et `COMMERCIAL` uniquement
+**D. Helmet headers**
+- `helmet()` dans `server/src/main.ts`
 
-### 🟠 Important avant démo
+**E. Dashboard stats branchées BDD**
+- Remplacer les 4 valeurs statiques par les vrais endpoints
 
-#### C. Dashboard stats branchées BDD
-Remplacer les valeurs statiques par :
-- `GET /orders?status=pending` → count commandes en attente
-- `GET /users?role=CLIENT_PRO&isActive=true` → count clients actifs
+### 🟠 Sprint 1 — Anti-pattern à corriger
 
-#### D. Tests manquants
-Cibles prioritaires : DTOs NestJS · guards d'autorisation · SageService mock
-Seul `pricing.service.spec.ts` existe actuellement.
+**F. Créer users.controller.ts**
+- Extraire les routes HTTP du `users.service.ts` vers un vrai controller
+- Pattern NestJS : controller = routes HTTP, service = logique métier
 
-### 🟡 Prod (pas urgent pour démo)
-- Auth admin : `localStorage` → `httpOnly` cookie
-- Rate limiting : `@nestjs/throttler` sur `POST /auth/login`
-- Headers sécurité : `helmet()` dans `server/src/main.ts`
-- Import catalogue Excel : upload + parsing → `ProductEntity`
+### 🟡 Cosmétique — à nettoyer
+
+**G. Unifier les fichiers de couleurs**
+- `utils/colors.ts` et `constants/Colors.ts` sont un doublon
+- Garder `constants/Colors.ts`, supprimer `utils/colors.ts`
+- Mettre à jour les imports
+
+**H. Supprimer PROJECT.md**
+- Marqué "désynchronisé" — remplacer par un lien vers CLAUDE.md
+
+### 🔲 Phase 3 — Après feedback client (ne pas implémenter avant signal)
+- Rôle commercial mobile (`feat/commercial`)
+- Stripe paiement CB réel (`STRIPE_ENABLED=true`)
+- Sage API réelle (`SAGE_MOCK_MODE=false`)
+- Import catalogue Excel
 - Promotions temporaires (CDC §3.1 + §3.5)
 - PDF factures (CDC §3.4)
+- OVH déploiement production
+- SSL pinning mobile
+- Transporteurs FedEx / Geodis (optionnel)
 
 ---
 
-## 6. Architecture des dossiers
+## 6. Moteur de prix B2B — règles absolues
+
+**Ne jamais modifier sans comprendre ce mécanisme.**
 
 ```
-ElecProDeals/
-├── CLAUDE.md                          ← CE FICHIER
-├── TASKS.md                           ← Kanban du projet
-├── docs/
-│   ├── CDC_Elec_Pro_Deals-v2.pdf      ← Cahier des charges
-│   ├── API.md                         ← Documentation endpoints
-│   ├── pricing-engine.md              ← Logique feuilles de prix
-│   └── sage-connector.md              ← Stratégie mock → réel
-│
-├── app/                               ← Mobile Expo Router
-│   ├── (auth)/
-│   │   └── login.tsx                  ✅ Zod, redirect par rôle
-│   ├── (client)/                      ✅ 5 tabs fonctionnels
-│   ├── (commercial)/                  ⚠️ STUB — branche feat/commercial
-│   └── (admin)/                       → Redirige vers backoffice web
-│
-├── components/ui/                     ← Composants NativeWind génériques
-├── services/                          ← Axios + intercepteurs JWT
-│   ├── api.ts                         ← Client HTTP central
-│   ├── auth.service.ts
-│   ├── catalog.service.ts
-│   ├── orders.service.ts
-│   ├── invoices.service.ts
-│   └── notifications.service.ts
-│
-├── stores/                            ← Redux Toolkit slices
-│   ├── auth.slice.ts
-│   ├── cart.slice.ts
-│   └── ui.slice.ts
-│
-├── types/                             ← Interfaces TypeScript partagées
-│   ├── user.types.ts
-│   ├── product.types.ts
-│   ├── order.types.ts
-│   ├── invoice.types.ts
-│   └── pricing.types.ts
-│
-├── hooks/
-│   ├── useAuthGuard.ts                ← Redirect par rôle
-│   └── useAppStore.ts
-│
-├── lib/
-│   └── mmkvStorage.ts                 ← MMKV API (voir §8 — version à aligner)
-│
-├── server/src/                        ← NestJS Backend
-│   ├── modules/
-│   │   ├── auth/                      ✅ JWT login/refresh/me
-│   │   ├── users/                     ✅ CRUD + RGPD
-│   │   ├── catalog/                   ✅ Produits + pricing à la volée
-│   │   ├── orders/                    ✅ + PATCH status à ajouter
-│   │   ├── pricing/                   ✅ Moteur feuilles de prix B2B
-│   │   ├── invoices/                  ✅ Délègue à SageService
-│   │   ├── notifications/             ✅ Broadcast + ciblé
-│   │   ├── sage/                      ✅ Mock complet — @docs/sage-connector.md
-│   │   └── stripe/                    ✅ Module isolé mocké Phase 2
-│   ├── common/
-│   │   ├── guards/                    ← JwtAuthGuard, RolesGuard
-│   │   └── decorators/                ← @Roles(), @CurrentUser()
-│   └── database/
-│       ├── migrations/                ← NE PAS utiliser synchronize:true en prod
-│       └── seed.ts                    ← Credentials de test seedés
-│
-└── admin/app/                         ← Next.js Backoffice
-    ├── login/
-    └── (admin)/                       ✅ 7 pages fonctionnelles
-```
-
----
-
-## 7. Moteur de prix B2B — règles absolues
-
-C'est le cœur métier différenciant. **Ne jamais modifier sans lire `docs/pricing-engine.md` d'abord.**
-
-```
-Priorité de résolution du prix :
-1. pricingSheetId individuel du client  (exception individuelle)
+Priorité de résolution :
+1. pricingSheetId individuel du client  (exception individuelle — priorité max)
    └─ Si absent →
 2. Feuille par customerTypology          (règle de groupe)
    └─ Si absent →
@@ -235,85 +159,136 @@ Une feuille = N règles appliquées en CASCADE par sortOrder
 Opérateurs : multiply (prix * value) | add (prix + value)
 ```
 
-**3 feuilles seedées en BDD :**
+**3 feuilles seedées :**
 ```
-sheet-artisan-standard     → multiply 0.90  (−10%)
-sheet-gros-installateur    → multiply 0.82  (−18%)
-sheet-grossiste            → multiply 0.75  (−25%)
+sheet-artisan-standard    → multiply 0.90  (−10%)
+sheet-gros-installateur   → multiply 0.82  (−18%)
+sheet-grossiste           → multiply 0.75  (−25%)
 ```
 
 ---
 
-## 8. SageService — règle absolue
+## 7. SageService — règle absolue
 
-**Aucun code ne doit appeler Sage directement.** Tout passe par `SageService`.
+**Aucun code ne doit appeler Sage directement. Tout passe par `SageService`.**
 
 ```typescript
-// server/src/modules/sage/sage.service.ts
-// Pattern à respecter impérativement
-
 @Injectable()
 export class SageService {
   private get isMock(): boolean {
     return this.config.get('SAGE_MOCK_MODE') === 'true';
   }
-  // Catalogue → PostgreSQL réel (pas mock)
+  // Catalogue → PostgreSQL réel
   // Factures, devis → mock JSON statique
   // Commandes → BDD locale (sageOrderRef = null)
 }
 ```
 
-**Pour activer Sage réel :** remplacer uniquement l'implémentation interne — aucune autre fichier ne change.
+Pour activer Sage réel : remplacer uniquement `server/src/modules/sage/sage.service.ts` — aucun autre fichier ne change.
 
 ---
 
-## 9. Authentification mobile — flux complet
+## 8. Authentification mobile — flux complet
 
 ```typescript
 // Login
 authService.login() → JWT access (15min) + refresh (7j)
   → MMKV.set('access_token', ...)   // Jamais AsyncStorage
   → MMKV.set('refresh_token', ...)
-  → dispatch(setCredentials())       // Redux
+  → dispatch(setCredentials())
 
-// Intercepteur Axios (services/api.ts)
-// 401 reçu → tentative refresh automatique
+// Intercepteur Axios — 401 reçu → refresh automatique
 // Refresh échoue → logout + redirect /(auth)/login
 
-// Protection des routes
+// Protection routes
 useAuthGuard('CLIENT_PRO')   // app/(client)/_layout.tsx
 useAuthGuard('COMMERCIAL')   // app/(commercial)/_layout.tsx
-useAuthGuard('ADMIN')        // redirige vers backoffice web
 ```
 
 ---
 
-## 10. RGPD — règles de code non négociables
+## 9. Dépendances — points d'attention
+
+### Fixes à appliquer (Sprint 0 — à faire maintenant)
+```bash
+# MMKV v4 + nitro-modules compatible (risque crash Android si non fait)
+npx expo install react-native-mmkv@latest react-native-nitro-modules@latest
+
+# react-test-renderer doit matcher React 19
+npx expo install react-test-renderer@19.1.0
+
+# Supprimer passport-local (non utilisé)
+cd server && npm uninstall passport-local @types/passport-local
+```
+
+### expo-blur — NE PAS supprimer
+Utilisé dans `components/ui/TabBarBackground.ios.tsx` pour l'effet verre dépoli de la barre d'onglets iOS. C'est le comportement natif Apple attendu.
+
+### Packages INTERDITS — ne jamais installer
+| Package | Raison |
+|---------|--------|
+| `moment.js` | Abandonné, 66KB — utiliser `date-fns` ou `Intl` natif |
+| `lodash` | 70KB — utiliser ES2022 natif |
+| `react-native-paper` | Redondant avec NativeWind |
+| `@react-native-firebase/*` | Conflit avec expo-notifications |
+| `formik` | Redondant — Zod v4 suffit |
+
+### Packages Phase 2 — ne pas installer avant signal
+| Package | Déclencheur |
+|---------|-------------|
+| `@stripe/stripe-react-native` | `STRIPE_ENABLED=true` décidé |
+| `@nestjs/throttler` | Sprint 1 sécurité |
+| `helmet` | Sprint 1 sécurité |
+| `react-native-ssl-public-key-pinning` | Build store final |
+
+---
+
+## 10. Structure codebase — points clés
+
+### Mobile
+- `components/ui/` — 25 composants NativeWind production-ready, ne pas dupliquer
+- `components/catalog/` et `components/orders/` — vides, à remplir lors du sprint commercial
+- `utils/colors.ts` — doublon à supprimer (garder `constants/Colors.ts`)
+- `lib/` et `providers/` — helpers globaux, ne pas y mettre de logique métier
+
+### Backend
+- `users/` — **créer `users.controller.ts`** et y déplacer les routes HTTP depuis `users.service.ts`
+- `common/guards/` — JwtAuthGuard + RolesGuard — ne jamais contourner ces guards
+- `database/migrations/` — toujours créer une migration TypeORM, jamais `synchronize: true` en prod
+- `database/seed.ts` — idempotent, à relancer si BDD vide
+
+### Admin
+- Token stocké en `localStorage` → **migrer vers `httpOnly` cookie** (Sprint 1 priorité 🔴)
+- TailwindCSS v4 — syntaxe différente du mobile (v3), ne pas mélanger
+
+---
+
+## 11. RGPD — règles de code non négociables
 
 ```typescript
 // ❌ JAMAIS logger des données personnelles
 logger.log(`User ${user.email} logged in`);   // INTERDIT
-logger.log(`Order ${orderId} by ${user.id}`); // OK — ID anonyme seulement
+logger.log(`Order ${orderId} by ${user.id}`); // OK — ID anonyme
 
-// ✅ Soft delete obligatoire (droit à l'effacement)
+// ✅ Soft delete obligatoire
 @DeleteDateColumn()
-deletedAt: Date;  // Jamais DELETE FROM — toujours soft delete
+deletedAt: Date;  // Jamais DELETE FROM
 
-// ✅ JWT payload minimal — jamais d'email/nom dans le token
+// ✅ JWT payload minimal
 interface JwtPayload {
   sub: string;      // userId uniquement
   role: UserRole;
   iat: number;
-  exp: number;
+  exp: number;      // Pas d'email, nom, téléphone
 }
 
-// ✅ Données hébergées OVH France uniquement
-// ✅ Export RGPD disponible : GET /users/:id/export
+// ✅ Export RGPD disponible
+// GET /users/:id/export — déjà implémenté
 ```
 
 ---
 
-## 11. Conventions de code — non négociables
+## 12. Conventions de code
 
 ### TypeScript strict
 ```typescript
@@ -324,39 +299,59 @@ const result: OrderResponse = ...
 // ❌ Jamais
 const data: any = ...
 // @ts-ignore
-const x = {} as unknown as MyType  // double cast interdit
 ```
 
 ### Nommage
 ```
-PascalCase      → Composants React, Interfaces, Types, Enums, Classes
-camelCase       → Variables, fonctions, hooks (useXxx), méthodes
-SCREAMING_CASE  → Constantes, enums values, variables d'env
+PascalCase      → Composants, Interfaces, Types, Enums, Classes
+camelCase       → Variables, fonctions, hooks (useXxx)
+SCREAMING_CASE  → Constantes, enums values, env variables
 kebab-case      → Fichiers, dossiers, routes URL
 ```
 
 ### Commits (format obligatoire)
 ```
-feat(commercial): add client list screen
-fix(orders): apply correct price sheet on B2B checkout
+feat(orders): add PATCH status endpoint
+fix(pricing): apply correct price sheet on B2B checkout
 chore(deps): align mmkv to v4 with nitro-modules 0.35
-refactor(auth): extract token refresh to dedicated hook
-test(pricing): add unit tests for cascade rule engine
+refactor(users): extract controller from service
+test(guards): add roles guard unit tests
+security(admin): migrate localStorage to httpOnly cookie
 ```
 
-### Git
+### Git — branches
 ```
-main      ← stable, livrable client
-develop   ← intégration
-feat/xxx  ← features (ex: feat/commercial, feat/order-status)
-fix/xxx   ← corrections ciblées
+main      ← stable, livrable client — jamais de commit direct
+develop   ← intégration — CI/CD tourne ici
+feat/xxx  ← features
+fix/xxx   ← corrections
 ```
 
 ---
 
-## 12. Variables d'environnement
+## 13. Tests — plan de couverture
 
-### `server/.env` (non commité — ne jamais commiter)
+### Requis avant merge vers main
+| Fichier | Ce qu'il teste |
+|---------|---------------|
+| `pricing.service.spec.ts` | ✅ Existe — compléter avec cascade + exceptions |
+| `roles.guard.spec.ts` | CLIENT_PRO ne peut pas accéder aux routes ADMIN/COMMERCIAL |
+| `sage.service.spec.ts` | Mock retourne des données conformes aux interfaces |
+| `auth.dto.spec.ts` | Email invalide, password court, champs manquants |
+| `orders.service.spec.ts` | Création, annulation, changement de statut |
+| `users.controller.spec.ts` | À créer après extraction du controller |
+
+### Non testé en POC (décision assumée)
+- Composants React Native visuels
+- Pages Next.js admin
+- Migrations TypeORM
+- Flow Stripe complet
+
+---
+
+## 14. Variables d'environnement
+
+### `server/.env` (non commité)
 ```env
 NODE_ENV=development
 PORT=3000
@@ -380,7 +375,7 @@ EXPO_PUBLIC_API_BASE_URL=http://192.168.1.148:3000
 
 ---
 
-## 13. Commandes utiles
+## 15. Commandes utiles
 
 ```powershell
 # Backend
@@ -396,15 +391,15 @@ docker start elecprodeals-db
 cd server && npx ts-node src/database/seed.ts
 
 # TypeScript check (0 erreur attendu sur les 3 couches)
+npx tsc --noEmit
 cd server && npx tsc --noEmit
-cd .. && npx tsc --noEmit
 cd admin && npx tsc --noEmit
 
 # Tests
 cd server && npm run test
 ```
 
-### Credentials de test (seedés en BDD)
+### Credentials de test
 ```
 admin@demo.fr              / password123
 commercial@demo.fr         / password123
@@ -414,44 +409,7 @@ gros-installateur@demo.fr  / password123
 
 ---
 
-## 14. Packages INTERDITS dans ce projet
-
-Ne jamais installer, ne jamais proposer :
-
-| Package | Raison |
-|---------|--------|
-| `moment.js` | Abandonné, 66KB — utiliser `date-fns` ou `Intl` natif |
-| `lodash` | 70KB — utiliser ES2022 natif |
-| `react-native-paper` | Redondant avec NativeWind déjà en place |
-| `@react-native-firebase/*` | Conflit avec expo-notifications déjà configuré |
-| `formik` | Redondant — Zod v4 + react-hook-form si besoin |
-| Toute lib > 18 mois sans commit | Risque CVE, incompatibilité New Architecture |
-
----
-
-## 15. Packages prévus Phase 2 — ne pas installer avant signal
-
-| Package | Déclencheur |
-|---------|-------------|
-| `@stripe/stripe-react-native` + `stripe` server | `STRIPE_ENABLED=true` décidé |
-| `@nestjs/throttler` | Sprint sécurité avant prod OVH |
-| `helmet` | Sprint sécurité avant prod OVH |
-| `react-native-ssl-public-key-pinning` | Build store final |
-| `expo-local-authentication` | Feature biométrie validée |
-
----
-
-## 16. Hors scope — ne pas implémenter sans validation
-
-- Connexion transporteurs FedEx / Geodis
-- Historique commandes consolidé
-- Module statistiques avancées
-- Version web pour les clients
-- Sage API réelle (accès credentials en attente)
-
----
-
-## 17. Escalade
+## 16. Escalade — règle absolue
 
 **Toute décision d'architecture** (nouvelle lib majeure, changement de pattern, modification schéma BDD, nouveau module) → remonter sur **Claude.ai Project "ElecProDeals"** avant d'implémenter.
 
