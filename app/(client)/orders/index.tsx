@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ShoppingCart, Trash2, Package, CheckCircle } from 'lucide-react-native';
+import { ShoppingCart, Trash2, Package, CircleCheck } from 'lucide-react-native';
 import { useAppSelector, useAppDispatch } from '@/hooks/useAppStore';
 import { removeItem, updateQuantity, clearCart } from '@/stores/cart.slice';
 import { ordersService } from '@/services/orders.service';
@@ -61,7 +61,7 @@ function CartSection() {
   if (success) {
     return (
       <View className="mx-4 mt-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-5 items-center">
-        <CheckCircle size={32} color="#16a34a" strokeWidth={1.8} />
+        <CircleCheck size={32} color="#16a34a" strokeWidth={1.8} />
         <Text className="text-green-700 dark:text-green-400 font-semibold mt-2">Commande envoyée !</Text>
         <Text className="text-green-600 dark:text-green-500 text-xs mt-1 text-center">
           Votre bon de commande a été transmis.

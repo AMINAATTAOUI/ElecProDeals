@@ -1,24 +1,34 @@
-export type InvoiceStatus = 'pending' | 'paid' | 'overdue';
-export type QuoteStatus = 'draft' | 'sent' | 'accepted' | 'refused' | 'invoiced';
+export type InvoiceStatus = 'unpaid' | 'paid' | 'overdue';
+export type QuoteStatus = 'pending' | 'accepted' | 'refused' | 'expired';
 
 export interface Invoice {
   id: string;
-  sageId: string;
+  sageRef: string;
   clientId: string;
+  orderId: string | null;
   amount: number;
+  vatAmount: number;
   status: InvoiceStatus;
   dueDate: string;
-  issueDate: string;
+  issuedAt: string;
   pdfUrl: string | null;
+}
+
+export interface QuoteItem {
+  productRef: string;
+  productName: string;
+  quantity: number;
+  unitPrice: number;
 }
 
 export interface Quote {
   id: string;
-  sageId: string;
+  sageRef: string;
   clientId: string;
-  amount: number;
+  items: QuoteItem[];
+  totalHT: number;
   status: QuoteStatus;
   validUntil: string;
-  createdAt: string;
+  issuedAt: string;
   pdfUrl: string | null;
 }

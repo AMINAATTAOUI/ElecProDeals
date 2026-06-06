@@ -2,13 +2,14 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, ILike } from 'typeorm';
 import { ProductEntity } from '../database/entities/product.entity';
-import type { PriceSheet, ComputedPrice } from '../types/pricing.types';
-import type { CustomerType } from '../types/user.types';
+import type { Invoice, Quote } from '../types/invoice.types';
 
 /**
  * SageService — Couche abstraction obligatoire pour tout accès Sage 100.
- * Phase POC : produits stockes en PostgreSQL (seed), feuilles de prix en memoire.
- * Phase production : remplacer uniquement l implementation interne.
+ * Phase POC : produits stockés en PostgreSQL (seed).
+ *             Devis et factures : données mockées (structures JSON exactes attendues).
+ * Phase production : remplacer uniquement l'implémentation interne.
+ * Calcul des prix : délégué à PricingService.
  */
 @Injectable()
 export class SageService {
@@ -17,50 +18,7 @@ export class SageService {
     private readonly productsRepo: Repository<ProductEntity>,
   ) {}
 
-  private readonly PRICE_SHEETS: PriceSheet[] = [
-    {
-      id: 'sheet-artisan-standard',
-      name: 'Artisans & Installateurs Standard',
-      appliesTo: 'artisan',
-      rules: [
-        {
-          id: 'rule-artisan-default',
-          operator: 'multiply',
-          value: 0.82,
-          description: 'Remise 18% sur prix public',
-        },
-      ],
-      isActive: true,
-    },
-    {
-      id: 'sheet-gros-installateur',
-      name: 'Gros Installateurs',
-      appliesTo: 'large_installer',
-      rules: [
-        {
-          id: 'rule-gros-installateur-default',
-          operator: 'multiply',
-          value: 0.72,
-          description: 'Remise 28% sur prix public',
-        },
-      ],
-      isActive: true,
-    },
-    {
-      id: 'sheet-grossiste',
-      name: 'Grossistes',
-      appliesTo: 'wholesaler',
-      rules: [
-        {
-          id: 'rule-grossiste-default',
-          operator: 'multiply',
-          value: 0.60,
-          description: 'Remise 40% sur prix public',
-        },
-      ],
-      isActive: true,
-    },
-  ];
+  // ─── Catalogue ────────────────────────────────────────────────────────────
 
   async getProducts(): Promise<ProductEntity[]> {
     return this.productsRepo.find({ where: { isActive: true }, order: { name: 'ASC' } });
@@ -81,44 +39,118 @@ export class SageService {
     });
   }
 
-  getPriceSheetForCustomerType(customerType: CustomerType): PriceSheet | undefined {
-    return this.PRICE_SHEETS.find((s) => s.appliesTo === customerType && s.isActive);
+  // ─── Factures (mock POC) ──────────────────────────────────────────────────
+
+  async getInvoicesByClient(clientId: string): Promise<Invoice[]> {
+    const base = new Date();
+    const daysAgo = (n: number) => {
+      const d = new Date(base);
+      d.setDate(d.getDate() - n);
+      return d;
+    };
+    const daysLater = (n: number) => {
+      const d = new Date(base);
+      d.setDate(d.getDate() + n);
+      return d;
+    };
+
+    return [
+      {
+        id: `sage-inv-${clientId.slice(0, 8)}-001`,
+        sageRef: 'FAC-2026-0031',
+        clientId,
+        orderId: null,
+        amount: 342.80,
+        vatAmount: 57.13,
+        status: 'unpaid',
+        dueDate: daysLater(15),
+        issuedAt: daysAgo(5),
+        pdfUrl: null,
+      },
+      {
+        id: `sage-inv-${clientId.slice(0, 8)}-002`,
+        sageRef: 'FAC-2026-0027',
+        clientId,
+        orderId: null,
+        amount: 128.50,
+        vatAmount: 21.42,
+        status: 'paid',
+        dueDate: daysAgo(10),
+        issuedAt: daysAgo(40),
+        pdfUrl: null,
+      },
+      {
+        id: `sage-inv-${clientId.slice(0, 8)}-003`,
+        sageRef: 'FAC-2026-0019',
+        clientId,
+        orderId: null,
+        amount: 876.00,
+        vatAmount: 146.00,
+        status: 'overdue',
+        dueDate: daysAgo(5),
+        issuedAt: daysAgo(35),
+        pdfUrl: null,
+      },
+    ];
   }
 
-  computePrice(product: ProductEntity, customerType: CustomerType): ComputedPrice {
-    const sheet = this.getPriceSheetForCustomerType(customerType);
+  // ─── Devis (mock POC) ─────────────────────────────────────────────────────
 
-    if (!sheet) {
-      return {
-        productId: product.id,
-        publicPrice: Number(product.publicPrice),
-        finalPrice: Number(product.publicPrice),
-        discountPercent: 0,
-        priceSheetId: null,
-      };
-    }
-
-    let finalPrice = Number(product.publicPrice);
-    for (const rule of sheet.rules) {
-      if (rule.operator === 'multiply') {
-        finalPrice = finalPrice * rule.value;
-      } else if (rule.operator === 'subtract') {
-        finalPrice = finalPrice - rule.value;
-      } else if (rule.operator === 'fixed') {
-        finalPrice = rule.value;
-      }
-    }
-
-    const discountPercent = Math.round(
-      ((Number(product.publicPrice) - finalPrice) / Number(product.publicPrice)) * 100,
-    );
-
-    return {
-      productId: product.id,
-      publicPrice: Number(product.publicPrice),
-      finalPrice: Math.round(finalPrice * 100) / 100,
-      discountPercent,
-      priceSheetId: sheet.id,
+  async getQuotesByClient(clientId: string): Promise<Quote[]> {
+    const base = new Date();
+    const daysAgo = (n: number) => {
+      const d = new Date(base);
+      d.setDate(d.getDate() - n);
+      return d;
     };
+    const daysLater = (n: number) => {
+      const d = new Date(base);
+      d.setDate(d.getDate() + n);
+      return d;
+    };
+
+    return [
+      {
+        id: `sage-quo-${clientId.slice(0, 8)}-001`,
+        sageRef: 'DEV-2026-0018',
+        clientId,
+        items: [
+          { productRef: 'LEG-051234', productName: 'Tableau électrique 13 modules', quantity: 2, unitPrice: 89.50 },
+          { productRef: 'SCH-078123', productName: 'Disjoncteur différentiel 40A', quantity: 4, unitPrice: 265.50 },
+        ],
+        totalHT: 1240.00,
+        status: 'accepted',
+        validUntil: daysLater(20),
+        issuedAt: daysAgo(10),
+        pdfUrl: null,
+      },
+      {
+        id: `sage-quo-${clientId.slice(0, 8)}-002`,
+        sageRef: 'DEV-2026-0015',
+        clientId,
+        items: [
+          { productRef: 'PHI-045678', productName: 'Câble HO7RNF 3G2,5mm²', quantity: 100, unitPrice: 5.80 },
+        ],
+        totalHT: 580.00,
+        status: 'pending',
+        validUntil: daysLater(7),
+        issuedAt: daysAgo(23),
+        pdfUrl: null,
+      },
+      {
+        id: `sage-quo-${clientId.slice(0, 8)}-003`,
+        sageRef: 'DEV-2026-0011',
+        clientId,
+        items: [
+          { productRef: 'HAG-089012', productName: 'Interrupteur différentiel 63A type AC', quantity: 1, unitPrice: 312.00 },
+        ],
+        totalHT: 312.00,
+        status: 'expired',
+        validUntil: daysAgo(3),
+        issuedAt: daysAgo(33),
+        pdfUrl: null,
+      },
+    ];
   }
 }
+

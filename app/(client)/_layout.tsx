@@ -1,7 +1,7 @@
 import { Tabs } from 'expo-router';
 import { useColorScheme } from 'nativewind';
 import { View, Text } from 'react-native';
-import { Package, ShoppingCart, FileText, User } from 'lucide-react-native';
+import { Package, ShoppingCart, FileText, User, Bell } from 'lucide-react-native';
 import { useAuthGuard } from '@/hooks/useAuthGuard';
 import { useAppSelector } from '@/hooks/useAppStore';
 
@@ -85,6 +85,15 @@ export default function ClientLayout() {
           title: 'Factures',
           tabBarIcon: ({ color, size }) => (
             <FileText size={size} color={color} strokeWidth={1.8} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="notifications/index"
+        options={{
+          title: 'Alertes',
+          tabBarIcon: ({ color, size }) => (
+            <Bell size={size} color={color} strokeWidth={1.8} />
           ),
         }}
       />

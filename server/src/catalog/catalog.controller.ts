@@ -19,14 +19,15 @@ export class CatalogController {
     @Query('q') query?: string,
   ) {
     const user = await this.usersService.findById(jwtUser.sub);
+    const pricingSheetId = user?.role === 'client' ? user.pricingSheetId : null;
     const customerType =
       user?.role === 'client' ? user.customerType ?? undefined : undefined;
 
     if (query) {
-      return this.catalogService.searchProducts(query, customerType);
+      return this.catalogService.searchProducts(query, pricingSheetId, customerType);
     }
 
-    return this.catalogService.getProducts(customerType);
+    return this.catalogService.getProducts(pricingSheetId, customerType);
   }
 
   @Get('products/:id')
@@ -35,9 +36,10 @@ export class CatalogController {
     @CurrentUser() jwtUser: JwtPayload,
   ) {
     const user = await this.usersService.findById(jwtUser.sub);
+    const pricingSheetId = user?.role === 'client' ? user.pricingSheetId : null;
     const customerType =
       user?.role === 'client' ? user.customerType ?? undefined : undefined;
 
-    return this.catalogService.getProductById(id, customerType);
+    return this.catalogService.getProductById(id, pricingSheetId, customerType);
   }
 }

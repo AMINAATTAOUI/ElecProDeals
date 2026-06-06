@@ -3,11 +3,17 @@ import { View, Text, KeyboardAvoidingView, Platform, ScrollView, Pressable, Acti
 import { useRouter } from 'expo-router';
 import type { Href } from 'expo-router';
 import axios from 'axios';
+import { z } from 'zod';
 import { Zap, Mail, Lock, Eye, EyeOff } from 'lucide-react-native';
 import { Input } from '@/components/ui/input';
 import { useAppDispatch } from '@/hooks/useAppStore';
 import { setCredentials } from '@/stores/auth.slice';
 import { authService } from '@/services/auth.service';
+
+const loginSchema = z.object({
+  email: z.string().email('Email invalide'),
+  password: z.string().min(8, 'Mot de passe trop court (8 caractères minimum)'),
+});
 
 export default function LoginScreen() {
   const dispatch = useAppDispatch();
@@ -21,14 +27,16 @@ export default function LoginScreen() {
 
   async function handleLogin() {
     setError(null);
-    if (!email.trim() || !password.trim()) {
-      setError('Veuillez renseigner votre email et mot de passe.');
+
+    const parsed = loginSchema.safeParse({ email: email.trim(), password });
+    if (!parsed.success) {
+      setError(parsed.error.issues[0]?.message ?? 'Données invalides');
       return;
     }
 
     setLoading(true);
     try {
-      const result = await authService.login(email.trim().toLowerCase(), password);
+      const result = await authService.login(parsed.data.email.toLowerCase(), parsed.data.password);
       dispatch(setCredentials({ user: result.user, accessToken: result.accessToken }));
 
       switch (result.user.role) {

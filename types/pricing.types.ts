@@ -1,23 +1,28 @@
 import type { CustomerType } from './user.types';
 
-export type PricingRuleOperator = 'multiply' | 'add_percent' | 'fixed';
+export type PricingRuleOperator = 'multiply' | 'add' | 'subtract' | 'fixed';
 
 export interface PricingRule {
+  id: string;
   operator: PricingRuleOperator;
   value: number;
+  description: string | null;
+  sortOrder: number;
 }
 
-export interface PricingSheet {
+export interface PriceSheet {
   id: string;
   name: string;
+  appliesTo: CustomerType | null;
+  isActive: boolean;
   rules: PricingRule[];
-  applicableCustomerTypes: CustomerType[];
-  applicableClientIds: string[];
 }
 
-export interface ClientPrice {
+/** Résultat du moteur de calcul retourné par le backend dans chaque produit */
+export interface ComputedPrice {
   productId: string;
-  computedPrice: number;
-  basePrice: number;
+  publicPrice: number;
+  finalPrice: number;
   discountPercent: number;
+  priceSheetId: string | null;
 }
