@@ -9,4 +9,3 @@ import { ProductEntity } from '../database/entities/product.entity';
   exports: [SageService],
 })
 export class SageModule {}
-

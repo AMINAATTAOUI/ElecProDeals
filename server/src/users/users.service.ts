@@ -50,14 +50,20 @@ export class UsersService {
     return this.usersRepo.findOne({ where: { id } });
   }
 
-  async update(id: string, dto: UpdateUserDto): Promise<Omit<UserEntity, 'passwordHash'>> {
+  async update(
+    id: string,
+    dto: UpdateUserDto,
+  ): Promise<Omit<UserEntity, 'passwordHash'>> {
     const user = await this.usersRepo.findOne({ where: { id } });
     if (!user) throw new NotFoundException(`User ${id} not found`);
 
-    if (dto.pricingSheetId !== undefined) user.pricingSheetId = dto.pricingSheetId ?? null;
+    if (dto.pricingSheetId !== undefined)
+      user.pricingSheetId = dto.pricingSheetId ?? null;
     if (dto.isActive !== undefined) user.isActive = dto.isActive;
-    if (dto.isPaymentDeferred !== undefined) user.isPaymentDeferred = dto.isPaymentDeferred;
-    if (dto.assignedCommercialId !== undefined) user.assignedCommercialId = dto.assignedCommercialId ?? null;
+    if (dto.isPaymentDeferred !== undefined)
+      user.isPaymentDeferred = dto.isPaymentDeferred;
+    if (dto.assignedCommercialId !== undefined)
+      user.assignedCommercialId = dto.assignedCommercialId ?? null;
 
     await this.usersRepo.save(user);
     return this.toPublicProfile(user);
@@ -78,12 +84,12 @@ export class UsersService {
     const user = await this.usersRepo.findOne({ where: { id } });
     if (!user) throw new NotFoundException(`User ${id} not found`);
     const orders = await this.ordersRepo.find({ where: { clientId: id } });
-    const { passwordHash: _, ...profile } = user;
+    const { passwordHash: _passwordHash, ...profile } = user;
     return { profile, orders, exportedAt: new Date().toISOString() };
   }
 
   toPublicProfile(user: UserEntity): Omit<UserEntity, 'passwordHash'> {
-    const { passwordHash: _, ...profile } = user;
+    const { passwordHash: _passwordHash, ...profile } = user;
     return profile;
   }
 }

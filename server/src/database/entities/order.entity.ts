@@ -20,7 +20,12 @@ export class OrderEntity {
   @Column({ name: 'client_id', type: 'varchar', length: 36 })
   clientId!: string;
 
-  @Column({ name: 'commercial_id', type: 'varchar', length: 36, nullable: true })
+  @Column({
+    name: 'commercial_id',
+    type: 'varchar',
+    length: 36,
+    nullable: true,
+  })
   commercialId!: string | null;
 
   @Column({ type: 'varchar', length: 20, default: 'pending' })
@@ -38,7 +43,12 @@ export class OrderEntity {
   @Column({ type: 'text', nullable: true })
   notes!: string | null;
 
-  @Column({ name: 'sage_order_ref', type: 'varchar', length: 100, nullable: true })
+  @Column({
+    name: 'sage_order_ref',
+    type: 'varchar',
+    length: 100,
+    nullable: true,
+  })
   sageOrderRef!: string | null;
 
   @OneToMany(() => OrderItemEntity, (item) => item.order, {

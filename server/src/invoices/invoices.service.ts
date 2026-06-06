@@ -7,10 +7,10 @@ export class InvoicesService {
   constructor(private readonly sageService: SageService) {}
 
   async getInvoices(clientId: string): Promise<Invoice[]> {
-    return this.sageService.getInvoicesByClient(clientId);
+    return Promise.resolve(this.sageService.getInvoicesByClient(clientId));
   }
 
   async getQuotes(clientId: string): Promise<Quote[]> {
-    return this.sageService.getQuotesByClient(clientId);
+    return Promise.resolve(this.sageService.getQuotesByClient(clientId));
   }
 }

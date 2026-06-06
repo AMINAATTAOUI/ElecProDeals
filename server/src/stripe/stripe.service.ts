@@ -24,10 +24,14 @@ export class StripeService {
 
   createPaymentIntent(dto: CreatePaymentIntentDto): PaymentIntent {
     if (this.isEnabled) {
-      throw new NotImplementedException('Stripe real integration not yet activated (Phase 2)');
+      throw new NotImplementedException(
+        'Stripe real integration not yet activated (Phase 2)',
+      );
     }
 
-    this.logger.log(`[MOCK] createPaymentIntent orderId=${dto.orderId} amount=${dto.amountCents}cts`);
+    this.logger.log(
+      `[MOCK] createPaymentIntent orderId=${dto.orderId} amount=${dto.amountCents}cts`,
+    );
 
     return {
       id: `pi_mock_${Date.now()}`,
@@ -43,7 +47,9 @@ export class StripeService {
 
   confirmPayment(paymentIntentId: string): ConfirmPaymentResult {
     if (this.isEnabled) {
-      throw new NotImplementedException('Stripe real integration not yet activated (Phase 2)');
+      throw new NotImplementedException(
+        'Stripe real integration not yet activated (Phase 2)',
+      );
     }
 
     this.logger.log(`[MOCK] confirmPayment piId=${paymentIntentId}`);
@@ -57,7 +63,9 @@ export class StripeService {
 
   createRefund(dto: RefundDto): Refund {
     if (this.isEnabled) {
-      throw new NotImplementedException('Stripe real integration not yet activated (Phase 2)');
+      throw new NotImplementedException(
+        'Stripe real integration not yet activated (Phase 2)',
+      );
     }
 
     this.logger.log(`[MOCK] createRefund piId=${dto.paymentIntentId}`);

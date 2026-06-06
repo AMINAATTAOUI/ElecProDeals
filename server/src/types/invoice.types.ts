@@ -18,7 +18,12 @@ export interface Quote {
   id: string;
   sageRef: string;
   clientId: string;
-  items: Array<{ productRef: string; productName: string; quantity: number; unitPrice: number }>;
+  items: Array<{
+    productRef: string;
+    productName: string;
+    quantity: number;
+    unitPrice: number;
+  }>;
   totalHT: number;
   status: QuoteStatus;
   validUntil: Date;

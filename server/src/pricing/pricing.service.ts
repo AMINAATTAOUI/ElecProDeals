@@ -6,7 +6,10 @@ import { PricingRuleEntity } from '../database/entities/pricing-rule.entity';
 import { ProductEntity } from '../database/entities/product.entity';
 import type { ComputedPrice } from '../types/pricing.types';
 import type { CustomerType } from '../types/user.types';
-import { CreatePriceSheetDto, UpdatePriceSheetDto } from './dto/create-price-sheet.dto';
+import {
+  CreatePriceSheetDto,
+  UpdatePriceSheetDto,
+} from './dto/create-price-sheet.dto';
 
 @Injectable()
 export class PricingService {
@@ -25,7 +28,9 @@ export class PricingService {
     return this.sheetsRepo.findOne({ where: { id } });
   }
 
-  findByCustomerType(customerType: CustomerType): Promise<PriceSheetEntity | null> {
+  findByCustomerType(
+    customerType: CustomerType,
+  ): Promise<PriceSheetEntity | null> {
     return this.sheetsRepo.findOne({
       where: { appliesTo: customerType, isActive: true },
     });
@@ -55,7 +60,10 @@ export class PricingService {
     return this.sheetsRepo.findOneOrFail({ where: { id: saved.id } });
   }
 
-  async update(id: string, dto: UpdatePriceSheetDto): Promise<PriceSheetEntity> {
+  async update(
+    id: string,
+    dto: UpdatePriceSheetDto,
+  ): Promise<PriceSheetEntity> {
     const sheet = await this.sheetsRepo.findOne({ where: { id } });
     if (!sheet) throw new NotFoundException(`PriceSheet ${id} not found`);
 
@@ -126,7 +134,9 @@ export class PricingService {
     }
 
     // 4. Appliquer les règles dans l'ordre
-    const sortedRules = [...sheet.rules].sort((a, b) => a.sortOrder - b.sortOrder);
+    const sortedRules = [...sheet.rules].sort(
+      (a, b) => a.sortOrder - b.sortOrder,
+    );
 
     let finalPrice = Number(product.publicPrice);
     for (const rule of sortedRules) {

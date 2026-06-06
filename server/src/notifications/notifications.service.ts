@@ -12,9 +12,14 @@ export class NotificationsService {
     private readonly notificationsRepo: Repository<NotificationEntity>,
   ) {}
 
-  async send(dto: SendNotificationDto, sender: JwtPayload): Promise<NotificationEntity> {
+  async send(
+    dto: SendNotificationDto,
+    sender: JwtPayload,
+  ): Promise<NotificationEntity> {
     if (sender.role === 'client') {
-      throw new ForbiddenException('Seuls les admins et commerciaux peuvent envoyer des notifications');
+      throw new ForbiddenException(
+        'Seuls les admins et commerciaux peuvent envoyer des notifications',
+      );
     }
 
     const notification = this.notificationsRepo.create({

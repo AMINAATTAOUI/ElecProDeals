@@ -21,10 +21,14 @@ export class CatalogController {
     const user = await this.usersService.findById(jwtUser.sub);
     const pricingSheetId = user?.role === 'client' ? user.pricingSheetId : null;
     const customerType =
-      user?.role === 'client' ? user.customerType ?? undefined : undefined;
+      user?.role === 'client' ? (user.customerType ?? undefined) : undefined;
 
     if (query) {
-      return this.catalogService.searchProducts(query, pricingSheetId, customerType);
+      return this.catalogService.searchProducts(
+        query,
+        pricingSheetId,
+        customerType,
+      );
     }
 
     return this.catalogService.getProducts(pricingSheetId, customerType);
@@ -38,7 +42,7 @@ export class CatalogController {
     const user = await this.usersService.findById(jwtUser.sub);
     const pricingSheetId = user?.role === 'client' ? user.pricingSheetId : null;
     const customerType =
-      user?.role === 'client' ? user.customerType ?? undefined : undefined;
+      user?.role === 'client' ? (user.customerType ?? undefined) : undefined;
 
     return this.catalogService.getProductById(id, pricingSheetId, customerType);
   }

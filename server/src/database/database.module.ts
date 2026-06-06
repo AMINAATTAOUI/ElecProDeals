@@ -21,12 +21,21 @@ import { NotificationEntity } from './entities/notification.entity';
         username: config.get<string>('DATABASE_USER', 'elecpro'),
         password: config.get<string>('DATABASE_PASSWORD'),
         database: config.get<string>('DATABASE_NAME', 'elecprodeals'),
-        entities: [UserEntity, ProductEntity, OrderEntity, OrderItemEntity, PriceSheetEntity, PricingRuleEntity, NotificationEntity],
+        entities: [
+          UserEntity,
+          ProductEntity,
+          OrderEntity,
+          OrderItemEntity,
+          PriceSheetEntity,
+          PricingRuleEntity,
+          NotificationEntity,
+        ],
         synchronize: config.get<string>('NODE_ENV') !== 'production',
         logging: config.get<string>('NODE_ENV') === 'development',
-        ssl: config.get<string>('NODE_ENV') === 'production'
-          ? { rejectUnauthorized: true }
-          : false,
+        ssl:
+          config.get<string>('NODE_ENV') === 'production'
+            ? { rejectUnauthorized: true }
+            : false,
       }),
     }),
   ],

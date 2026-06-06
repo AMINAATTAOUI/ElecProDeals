@@ -1,4 +1,14 @@
-import { Controller, Get, Patch, Delete, Param, Body, UseGuards, ForbiddenException, Request } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Patch,
+  Delete,
+  Param,
+  Body,
+  UseGuards,
+  ForbiddenException,
+  Request,
+} from '@nestjs/common';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -31,11 +41,13 @@ export class UsersController {
 
   // RGPD — export données (admin ou propre compte)
   @Get(':id/export')
-  exportData(@Param('id') id: string, @Request() req: { user: { id: string; role: string } }) {
+  exportData(
+    @Param('id') id: string,
+    @Request() req: { user: { id: string; role: string } },
+  ) {
     if (req.user.role !== 'admin' && req.user.id !== id) {
       throw new ForbiddenException('Access denied');
     }
     return this.usersService.exportUserData(id);
   }
 }
-

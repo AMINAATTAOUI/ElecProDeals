@@ -26,4 +26,3 @@ export interface ComputedPrice {
   priceSheetId: string | null;
   discountPercent: number;
 }
-

@@ -21,7 +21,10 @@ export class SageService {
   // ─── Catalogue ────────────────────────────────────────────────────────────
 
   async getProducts(): Promise<ProductEntity[]> {
-    return this.productsRepo.find({ where: { isActive: true }, order: { name: 'ASC' } });
+    return this.productsRepo.find({
+      where: { isActive: true },
+      order: { name: 'ASC' },
+    });
   }
 
   async getProductById(id: string): Promise<ProductEntity | null> {
@@ -41,7 +44,7 @@ export class SageService {
 
   // ─── Factures (mock POC) ──────────────────────────────────────────────────
 
-  async getInvoicesByClient(clientId: string): Promise<Invoice[]> {
+  getInvoicesByClient(clientId: string): Invoice[] {
     const base = new Date();
     const daysAgo = (n: number) => {
       const d = new Date(base);
@@ -60,7 +63,7 @@ export class SageService {
         sageRef: 'FAC-2026-0031',
         clientId,
         orderId: null,
-        amount: 342.80,
+        amount: 342.8,
         vatAmount: 57.13,
         status: 'unpaid',
         dueDate: daysLater(15),
@@ -72,7 +75,7 @@ export class SageService {
         sageRef: 'FAC-2026-0027',
         clientId,
         orderId: null,
-        amount: 128.50,
+        amount: 128.5,
         vatAmount: 21.42,
         status: 'paid',
         dueDate: daysAgo(10),
@@ -84,8 +87,8 @@ export class SageService {
         sageRef: 'FAC-2026-0019',
         clientId,
         orderId: null,
-        amount: 876.00,
-        vatAmount: 146.00,
+        amount: 876.0,
+        vatAmount: 146.0,
         status: 'overdue',
         dueDate: daysAgo(5),
         issuedAt: daysAgo(35),
@@ -96,7 +99,7 @@ export class SageService {
 
   // ─── Devis (mock POC) ─────────────────────────────────────────────────────
 
-  async getQuotesByClient(clientId: string): Promise<Quote[]> {
+  getQuotesByClient(clientId: string): Quote[] {
     const base = new Date();
     const daysAgo = (n: number) => {
       const d = new Date(base);
@@ -115,10 +118,20 @@ export class SageService {
         sageRef: 'DEV-2026-0018',
         clientId,
         items: [
-          { productRef: 'LEG-051234', productName: 'Tableau électrique 13 modules', quantity: 2, unitPrice: 89.50 },
-          { productRef: 'SCH-078123', productName: 'Disjoncteur différentiel 40A', quantity: 4, unitPrice: 265.50 },
+          {
+            productRef: 'LEG-051234',
+            productName: 'Tableau électrique 13 modules',
+            quantity: 2,
+            unitPrice: 89.5,
+          },
+          {
+            productRef: 'SCH-078123',
+            productName: 'Disjoncteur différentiel 40A',
+            quantity: 4,
+            unitPrice: 265.5,
+          },
         ],
-        totalHT: 1240.00,
+        totalHT: 1240.0,
         status: 'accepted',
         validUntil: daysLater(20),
         issuedAt: daysAgo(10),
@@ -129,9 +142,14 @@ export class SageService {
         sageRef: 'DEV-2026-0015',
         clientId,
         items: [
-          { productRef: 'PHI-045678', productName: 'Câble HO7RNF 3G2,5mm²', quantity: 100, unitPrice: 5.80 },
+          {
+            productRef: 'PHI-045678',
+            productName: 'Câble HO7RNF 3G2,5mm²',
+            quantity: 100,
+            unitPrice: 5.8,
+          },
         ],
-        totalHT: 580.00,
+        totalHT: 580.0,
         status: 'pending',
         validUntil: daysLater(7),
         issuedAt: daysAgo(23),
@@ -142,9 +160,14 @@ export class SageService {
         sageRef: 'DEV-2026-0011',
         clientId,
         items: [
-          { productRef: 'HAG-089012', productName: 'Interrupteur différentiel 63A type AC', quantity: 1, unitPrice: 312.00 },
+          {
+            productRef: 'HAG-089012',
+            productName: 'Interrupteur différentiel 63A type AC',
+            quantity: 1,
+            unitPrice: 312.0,
+          },
         ],
-        totalHT: 312.00,
+        totalHT: 312.0,
         status: 'expired',
         validUntil: daysAgo(3),
         issuedAt: daysAgo(33),
@@ -153,4 +176,3 @@ export class SageService {
     ];
   }
 }
-

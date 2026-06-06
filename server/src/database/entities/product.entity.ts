@@ -30,7 +30,12 @@ export class ProductEntity {
   @Column({ length: 50 })
   unit!: string;
 
-  @Column({ name: 'stock_status', type: 'varchar', length: 20, default: 'available' })
+  @Column({
+    name: 'stock_status',
+    type: 'varchar',
+    length: 20,
+    default: 'available',
+  })
   stockStatus!: StockStatus;
 
   @Column({ name: 'estimated_delivery_days', type: 'smallint', nullable: true })

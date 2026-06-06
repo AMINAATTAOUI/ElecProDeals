@@ -37,16 +37,31 @@ export class UserEntity {
   isActive!: boolean;
 
   // Client-specific fields (nullable for non-client roles)
-  @Column({ name: 'customer_type', type: 'varchar', length: 30, nullable: true })
+  @Column({
+    name: 'customer_type',
+    type: 'varchar',
+    length: 30,
+    nullable: true,
+  })
   customerType!: CustomerType | null;
 
-  @Column({ name: 'pricing_sheet_id', type: 'varchar', length: 100, nullable: true })
+  @Column({
+    name: 'pricing_sheet_id',
+    type: 'varchar',
+    length: 100,
+    nullable: true,
+  })
   pricingSheetId!: string | null;
 
   @Column({ name: 'is_payment_deferred', default: false })
   isPaymentDeferred!: boolean;
 
-  @Column({ name: 'assigned_commercial_id', type: 'varchar', length: 36, nullable: true })
+  @Column({
+    name: 'assigned_commercial_id',
+    type: 'varchar',
+    length: 36,
+    nullable: true,
+  })
   assignedCommercialId!: string | null;
 
   // Commercial-specific fields

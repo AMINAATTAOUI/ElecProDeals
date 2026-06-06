@@ -7,10 +7,11 @@ import { OrderEntity } from '../database/entities/order.entity';
 import { NotificationEntity } from '../database/entities/notification.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserEntity, OrderEntity, NotificationEntity])],
+  imports: [
+    TypeOrmModule.forFeature([UserEntity, OrderEntity, NotificationEntity]),
+  ],
   controllers: [UsersController],
   providers: [UsersService],
   exports: [UsersService],
 })
 export class UsersModule {}
-

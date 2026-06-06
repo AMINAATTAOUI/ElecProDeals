@@ -11,4 +11,3 @@ import { PricingModule } from '../pricing/pricing.module';
   providers: [CatalogService],
 })
 export class CatalogModule {}
-

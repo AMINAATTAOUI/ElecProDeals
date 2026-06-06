@@ -27,4 +27,3 @@ import { StripeModule } from './stripe/stripe.module';
   ],
 })
 export class AppModule {}
-

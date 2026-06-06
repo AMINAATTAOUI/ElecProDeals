@@ -9,7 +9,7 @@ import { ProductEntity } from '../../database/entities/product.entity';
 function makeProduct(publicPrice: number): ProductEntity {
   return {
     id: 'prod-1',
-    publicPrice: publicPrice as unknown as ProductEntity['publicPrice'],
+    publicPrice: publicPrice,
   } as ProductEntity;
 }
 
@@ -57,7 +57,11 @@ describe('PricingService — moteur de calcul', () => {
     it('retourne le prix public sans remise', async () => {
       sheetsRepo.findOne.mockResolvedValue(null);
 
-      const result = await service.computePrice(makeProduct(100), null, undefined);
+      const result = await service.computePrice(
+        makeProduct(100),
+        null,
+        undefined,
+      );
 
       expect(result.finalPrice).toBe(100);
       expect(result.discountPercent).toBe(0);
@@ -67,10 +71,16 @@ describe('PricingService — moteur de calcul', () => {
 
   describe('computePrice — règle multiply', () => {
     it('applique un coefficient de remise artisan 18%', async () => {
-      const sheet = makeSheet('s1', 'artisan', [{ operator: 'multiply', value: 0.82 }]);
+      const sheet = makeSheet('s1', 'artisan', [
+        { operator: 'multiply', value: 0.82 },
+      ]);
       sheetsRepo.findOne.mockResolvedValue(sheet);
 
-      const result = await service.computePrice(makeProduct(100), null, 'artisan');
+      const result = await service.computePrice(
+        makeProduct(100),
+        null,
+        'artisan',
+      );
 
       expect(result.finalPrice).toBe(82);
       expect(result.discountPercent).toBe(18);
@@ -78,20 +88,32 @@ describe('PricingService — moteur de calcul', () => {
     });
 
     it('applique remise gros installateur 28%', async () => {
-      const sheet = makeSheet('s2', 'large_installer', [{ operator: 'multiply', value: 0.72 }]);
+      const sheet = makeSheet('s2', 'large_installer', [
+        { operator: 'multiply', value: 0.72 },
+      ]);
       sheetsRepo.findOne.mockResolvedValue(sheet);
 
-      const result = await service.computePrice(makeProduct(200), null, 'large_installer');
+      const result = await service.computePrice(
+        makeProduct(200),
+        null,
+        'large_installer',
+      );
 
       expect(result.finalPrice).toBe(144);
       expect(result.discountPercent).toBe(28);
     });
 
     it('applique remise grossiste 40%', async () => {
-      const sheet = makeSheet('s3', 'wholesaler', [{ operator: 'multiply', value: 0.60 }]);
+      const sheet = makeSheet('s3', 'wholesaler', [
+        { operator: 'multiply', value: 0.6 },
+      ]);
       sheetsRepo.findOne.mockResolvedValue(sheet);
 
-      const result = await service.computePrice(makeProduct(50), null, 'wholesaler');
+      const result = await service.computePrice(
+        makeProduct(50),
+        null,
+        'wholesaler',
+      );
 
       expect(result.finalPrice).toBe(30);
       expect(result.discountPercent).toBe(40);
@@ -103,7 +125,11 @@ describe('PricingService — moteur de calcul', () => {
       const sheet = makeSheet('s4', null, [{ operator: 'fixed', value: 75 }]);
       sheetsRepo.findOne.mockResolvedValue(sheet);
 
-      const result = await service.computePrice(makeProduct(120), 's4', undefined);
+      const result = await service.computePrice(
+        makeProduct(120),
+        's4',
+        undefined,
+      );
 
       expect(result.finalPrice).toBe(75);
       expect(result.publicPrice).toBe(120);
@@ -115,16 +141,26 @@ describe('PricingService — moteur de calcul', () => {
       const sheet = makeSheet('s5', null, [{ operator: 'add', value: 10 }]);
       sheetsRepo.findOne.mockResolvedValue(sheet);
 
-      const result = await service.computePrice(makeProduct(100), 's5', undefined);
+      const result = await service.computePrice(
+        makeProduct(100),
+        's5',
+        undefined,
+      );
 
       expect(result.finalPrice).toBe(110);
     });
 
     it('soustrait un montant fixe du prix', async () => {
-      const sheet = makeSheet('s6', null, [{ operator: 'subtract', value: 15 }]);
+      const sheet = makeSheet('s6', null, [
+        { operator: 'subtract', value: 15 },
+      ]);
       sheetsRepo.findOne.mockResolvedValue(sheet);
 
-      const result = await service.computePrice(makeProduct(100), 's6', undefined);
+      const result = await service.computePrice(
+        makeProduct(100),
+        's6',
+        undefined,
+      );
 
       expect(result.finalPrice).toBe(85);
       expect(result.discountPercent).toBe(15);
@@ -132,7 +168,7 @@ describe('PricingService — moteur de calcul', () => {
   });
 
   describe('computePrice — chaîne multi-règles', () => {
-    it('applique les règles dans l\'ordre sortOrder', async () => {
+    it("applique les règles dans l'ordre sortOrder", async () => {
       // Prix public: 100
       // Règle 0 (sortOrder 0): multiply 0.9 → 90
       // Règle 1 (sortOrder 1): subtract 5  → 85
@@ -142,7 +178,11 @@ describe('PricingService — moteur de calcul', () => {
       ]);
       sheetsRepo.findOne.mockResolvedValue(sheet);
 
-      const result = await service.computePrice(makeProduct(100), 's7', undefined);
+      const result = await service.computePrice(
+        makeProduct(100),
+        's7',
+        undefined,
+      );
 
       expect(result.finalPrice).toBe(85);
     });
@@ -157,7 +197,11 @@ describe('PricingService — moteur de calcul', () => {
       ]);
       sheetsRepo.findOne.mockResolvedValue(sheet);
 
-      const result = await service.computePrice(makeProduct(100), 's8', undefined);
+      const result = await service.computePrice(
+        makeProduct(100),
+        's8',
+        undefined,
+      );
 
       expect(result.finalPrice).toBe(70);
     });
@@ -165,15 +209,23 @@ describe('PricingService — moteur de calcul', () => {
 
   describe('computePrice — priorité feuille individuelle', () => {
     it('utilise la feuille individuelle plutôt que celle par customerType', async () => {
-      const individualSheet = makeSheet('individual', null, [{ operator: 'multiply', value: 0.50 }]);
-      const typeSheet = makeSheet('type-sheet', 'artisan', [{ operator: 'multiply', value: 0.82 }]);
+      const individualSheet = makeSheet('individual', null, [
+        { operator: 'multiply', value: 0.5 },
+      ]);
+      const typeSheet = makeSheet('type-sheet', 'artisan', [
+        { operator: 'multiply', value: 0.82 },
+      ]);
 
       // Premier appel findOne (par ID) → feuille individuelle
       sheetsRepo.findOne.mockResolvedValueOnce(individualSheet);
       // Deuxième appel ne devrait pas être fait
       sheetsRepo.findOne.mockResolvedValueOnce(typeSheet);
 
-      const result = await service.computePrice(makeProduct(100), 'individual', 'artisan');
+      const result = await service.computePrice(
+        makeProduct(100),
+        'individual',
+        'artisan',
+      );
 
       expect(result.finalPrice).toBe(50);
       expect(result.priceSheetId).toBe('individual');
@@ -182,14 +234,20 @@ describe('PricingService — moteur de calcul', () => {
     });
 
     it('fallback sur feuille par customerType si feuille individuelle inactive/introuvable', async () => {
-      const typeSheet = makeSheet('type-sheet', 'artisan', [{ operator: 'multiply', value: 0.82 }]);
+      const typeSheet = makeSheet('type-sheet', 'artisan', [
+        { operator: 'multiply', value: 0.82 },
+      ]);
 
       // Premier appel (par ID) → null
       sheetsRepo.findOne.mockResolvedValueOnce(null);
       // Deuxième appel (par customerType) → feuille artisan
       sheetsRepo.findOne.mockResolvedValueOnce(typeSheet);
 
-      const result = await service.computePrice(makeProduct(100), 'unknown-id', 'artisan');
+      const result = await service.computePrice(
+        makeProduct(100),
+        'unknown-id',
+        'artisan',
+      );
 
       expect(result.finalPrice).toBe(82);
       expect(result.priceSheetId).toBe('type-sheet');
@@ -198,19 +256,31 @@ describe('PricingService — moteur de calcul', () => {
 
   describe('computePrice — edge cases', () => {
     it('ne produit pas un prix négatif', async () => {
-      const sheet = makeSheet('s-neg', null, [{ operator: 'subtract', value: 9999 }]);
+      const sheet = makeSheet('s-neg', null, [
+        { operator: 'subtract', value: 9999 },
+      ]);
       sheetsRepo.findOne.mockResolvedValue(sheet);
 
-      const result = await service.computePrice(makeProduct(10), 's-neg', undefined);
+      const result = await service.computePrice(
+        makeProduct(10),
+        's-neg',
+        undefined,
+      );
 
       expect(result.finalPrice).toBe(0);
     });
 
     it('arrondit à 2 décimales', async () => {
-      const sheet = makeSheet('s-round', null, [{ operator: 'multiply', value: 1 / 3 }]);
+      const sheet = makeSheet('s-round', null, [
+        { operator: 'multiply', value: 1 / 3 },
+      ]);
       sheetsRepo.findOne.mockResolvedValue(sheet);
 
-      const result = await service.computePrice(makeProduct(10), 's-round', undefined);
+      const result = await service.computePrice(
+        makeProduct(10),
+        's-round',
+        undefined,
+      );
 
       expect(result.finalPrice).toBe(3.33);
     });

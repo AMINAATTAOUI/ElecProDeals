@@ -1,4 +1,14 @@
-import { IsArray, IsEnum, IsIn, IsInt, IsOptional, IsString, IsUUID, Min, ValidateNested } from 'class-validator';
+import {
+  IsArray,
+  IsEnum,
+  IsIn,
+  IsInt,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Min,
+  ValidateNested,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateOrderItemDto {
@@ -25,6 +35,13 @@ export class CreateOrderDto {
 }
 
 export class UpdateOrderStatusDto {
-  @IsEnum(['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'])
+  @IsEnum([
+    'pending',
+    'confirmed',
+    'processing',
+    'shipped',
+    'delivered',
+    'cancelled',
+  ])
   status!: string;
 }

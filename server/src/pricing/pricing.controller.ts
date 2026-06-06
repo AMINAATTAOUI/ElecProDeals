@@ -15,7 +15,10 @@ import { PricingService } from './pricing.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
-import { CreatePriceSheetDto, UpdatePriceSheetDto } from './dto/create-price-sheet.dto';
+import {
+  CreatePriceSheetDto,
+  UpdatePriceSheetDto,
+} from './dto/create-price-sheet.dto';
 
 @Controller('pricing')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -39,7 +42,10 @@ export class PricingController {
   }
 
   @Patch('sheets/:id')
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdatePriceSheetDto) {
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: UpdatePriceSheetDto,
+  ) {
     return this.pricingService.update(id, dto);
   }
 

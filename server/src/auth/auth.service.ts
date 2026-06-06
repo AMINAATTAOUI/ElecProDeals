@@ -15,7 +15,10 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async login(email: string, password: string): Promise<AuthTokens & { user: object }> {
+  async login(
+    email: string,
+    password: string,
+  ): Promise<AuthTokens & { user: object }> {
     const user = await this.usersService.findByEmail(email);
 
     if (!user || !user.isActive) {
@@ -60,10 +63,20 @@ export class AuthService {
     email: string,
     role: string,
   ): Promise<AuthTokens> {
-    const payload: Omit<JwtPayload, 'iat' | 'exp'> = { sub: userId, email, role: role as JwtPayload['role'] };
+    const payload: Omit<JwtPayload, 'iat' | 'exp'> = {
+      sub: userId,
+      email,
+      role: role as JwtPayload['role'],
+    };
 
-    const accessExpiresIn = parseInt(process.env['JWT_ACCESS_EXPIRES_IN_SECONDS'] ?? '900', 10);
-    const refreshExpiresIn = parseInt(process.env['JWT_REFRESH_EXPIRES_IN_SECONDS'] ?? '604800', 10);
+    const accessExpiresIn = parseInt(
+      process.env['JWT_ACCESS_EXPIRES_IN_SECONDS'] ?? '900',
+      10,
+    );
+    const refreshExpiresIn = parseInt(
+      process.env['JWT_REFRESH_EXPIRES_IN_SECONDS'] ?? '604800',
+      10,
+    );
 
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {

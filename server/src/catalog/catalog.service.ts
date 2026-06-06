@@ -10,7 +10,9 @@ type ProductWithPricing = Omit<ProductEntity, 'publicPrice'> & {
   pricing?: ComputedPrice;
 };
 
-function normalizeProduct(p: ProductEntity): Omit<ProductEntity, 'publicPrice'> & { publicPrice: number } {
+function normalizeProduct(
+  p: ProductEntity,
+): Omit<ProductEntity, 'publicPrice'> & { publicPrice: number } {
   return { ...p, publicPrice: Number(p.publicPrice) };
 }
 
@@ -34,7 +36,11 @@ export class CatalogService {
     return Promise.all(
       products.map(async (product) => ({
         ...normalizeProduct(product),
-        pricing: await this.pricingService.computePrice(product, pricingSheetId, customerType),
+        pricing: await this.pricingService.computePrice(
+          product,
+          pricingSheetId,
+          customerType,
+        ),
       })),
     );
   }
@@ -54,7 +60,11 @@ export class CatalogService {
 
     return {
       ...normalizeProduct(product),
-      pricing: await this.pricingService.computePrice(product, pricingSheetId, customerType),
+      pricing: await this.pricingService.computePrice(
+        product,
+        pricingSheetId,
+        customerType,
+      ),
     };
   }
 
@@ -72,7 +82,11 @@ export class CatalogService {
     return Promise.all(
       products.map(async (product) => ({
         ...normalizeProduct(product),
-        pricing: await this.pricingService.computePrice(product, pricingSheetId, customerType),
+        pricing: await this.pricingService.computePrice(
+          product,
+          pricingSheetId,
+          customerType,
+        ),
       })),
     );
   }

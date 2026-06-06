@@ -1,4 +1,9 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { OrderEntity } from '../database/entities/order.entity';
@@ -25,7 +30,10 @@ export class OrdersService {
     return `EPD-${dateStr}-${random}`;
   }
 
-  async createOrder(clientId: string, dto: CreateOrderDto): Promise<OrderEntity> {
+  async createOrder(
+    clientId: string,
+    dto: CreateOrderDto,
+  ): Promise<OrderEntity> {
     if (!dto.items || dto.items.length === 0) {
       throw new BadRequestException('Order must contain at least one item');
     }
@@ -98,7 +106,9 @@ export class OrdersService {
   async cancelOrder(id: string, clientId: string): Promise<OrderEntity> {
     const order = await this.findOne(id, clientId);
     if (!['pending', 'confirmed'].includes(order.status)) {
-      throw new BadRequestException(`Cannot cancel order with status: ${order.status}`);
+      throw new BadRequestException(
+        `Cannot cancel order with status: ${order.status}`,
+      );
     }
     order.status = 'cancelled';
     return this.ordersRepository.save(order);
