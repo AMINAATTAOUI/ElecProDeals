@@ -40,8 +40,6 @@ jobs:
         run: npm run lint
 
   # ─────────────────────────────────────────────
-  # Job 2 — Backend (NestJS)
-  # ─────────────────────────────────────────────
   server:
     name: Server — TypeScript + ESLint + Jest
     runs-on: ubuntu-latest
