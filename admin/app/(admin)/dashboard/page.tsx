@@ -1,5 +1,17 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ShoppingCart, Users, Package, Clock } from 'lucide-react';
+import { apiFetch } from '@/lib/api';
+import { useAdminToken } from '@/hooks/useAdminToken';
+
+interface DashboardStats {
+  ordersToday: number;
+  revenueThisMonth: number;
+  activeClients: number;
+  pendingOrders: number;
+}
 
 interface StatCardProps {
   title: string;
@@ -22,6 +34,19 @@ function StatCard({ title, value, icon, description }: StatCardProps) {
 }
 
 export default function DashboardPage() {
+  const { token } = useAdminToken();
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+
+  useEffect(() => {
+    if (!token) return;
+    apiFetch<DashboardStats>('/admin/stats', token).then(setStats).catch(() => {
+      // Stats non critiques — on laisse afficher "—" en cas d'erreur
+    });
+  }, [token]);
+
+  const fmt = (n: number | undefined, decimals = 0) =>
+    n === undefined ? '—' : n.toLocaleString('fr-FR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+
   return (
     <div>
       <div className="mb-8">
@@ -29,35 +54,33 @@ export default function DashboardPage() {
         <p className="text-zinc-400 mt-1">Vue d&apos;ensemble de votre activité</p>
       </div>
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
         <StatCard
           title="Commandes aujourd'hui"
-          value="—"
+          value={fmt(stats?.ordersToday)}
           icon={<ShoppingCart size={20} />}
           description="Données temps réel"
         />
         <StatCard
           title="CA du mois"
-          value="—"
+          value={stats ? `${fmt(stats.revenueThisMonth, 2)} €` : '—'}
           icon={<Package size={20} />}
           description="Chiffre d'affaires"
         />
         <StatCard
           title="Clients actifs"
-          value="—"
+          value={fmt(stats?.activeClients)}
           icon={<Users size={20} />}
           description="Comptes activés"
         />
         <StatCard
           title="Commandes en attente"
-          value="—"
+          value={fmt(stats?.pendingOrders)}
           icon={<Clock size={20} />}
-          description="Statut pending/processing"
+          description="Statut pending/confirmed"
         />
       </div>
 
-      {/* Quick Links */}
       <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
         <h2 className="text-lg font-semibold text-zinc-100 mb-4">Actions rapides</h2>
         <div className="flex flex-wrap gap-3">
