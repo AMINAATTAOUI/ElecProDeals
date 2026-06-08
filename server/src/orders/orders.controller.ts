@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  ForbiddenException,
   Get,
   Param,
   ParseUUIDPipe,
@@ -10,6 +9,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { Roles } from '../common/decorators/roles.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { JwtPayload } from '../types/user.types';
 import type { OrderStatus } from '../types/order.types';
@@ -55,14 +56,12 @@ export class OrdersController {
   }
 
   @Patch(':id/status')
+  @Roles('admin', 'commercial')
+  @UseGuards(RolesGuard)
   async updateStatus(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateOrderStatusDto,
-    @CurrentUser() user: JwtPayload,
   ) {
-    if (user.role !== 'admin' && user.role !== 'commercial') {
-      throw new ForbiddenException('Insufficient permissions');
-    }
     return this.ordersService.updateStatus(id, dto.status as OrderStatus);
   }
 }

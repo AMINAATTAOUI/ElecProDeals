@@ -152,9 +152,11 @@ POST /orders/for-client  → createOrder avec clientId passé en body (commercia
 2. `app/(commercial)/catalog/index.tsx` — catalogue avec context client sélectionné
 3. `app/(commercial)/order/confirm.tsx` — confirmation commande
 
-#### B. `PATCH /orders/:id/status` — backend
-**Pourquoi :** L'admin doit pouvoir faire avancer une commande (`pending → confirmed → shipped → delivered`) pour la démo. Actuellement impossible côté backoffice.
-**Fichier :** `server/src/orders/orders.controller.ts` + `orders.service.ts`
+#### B. ✅ `PATCH /orders/:id/status` — FAIT (commit `4a55965`)
+- Transitions strictes `pending→confirmed→shipped→delivered` dans le service
+- `@Roles('admin','commercial')` + `RolesGuard` dans le controller
+- DTO restreint à `confirmed`, `shipped`, `delivered`
+- Bouton statut backoffice aligné (commit `e6eb3b8`) + bouton Annuler séparé (`/cancel`)
 
 ---
 
@@ -312,19 +314,11 @@ cd server ; npx ts-node src/database/seed.ts
 
 ## 11. Prochaine session — ordre recommandé
 
-### 🔴 Sprint 1 — CI/CD (priorité immédiate)
+### 🔴 Sprint 1 — suite immédiate (branche `feat/sprint1-client`)
 
-1. **CI/CD GitHub Actions** — pipeline `develop` → lint + tsc + tests
-   - Fichier : `.github/workflows/ci.yml`
-   - Jobs : `tsc --noEmit` sur les 3 couches, `npm run test` backend
-   - Déclencheur : push sur `develop` et `feat/*`
-
-2. **`PATCH /orders/:id/status`** — backend bloquant démo
-   - `server/src/orders/orders.controller.ts` + `orders.service.ts`
-   - Guard : `ADMIN` et `COMMERCIAL` uniquement
-   - Statuts : `pending → confirmed → shipped → delivered`
-
-3. **Sécurité admin localStorage → httpOnly cookie**
+1. ✅ ~~`PATCH /orders/:id/status`~~ — FAIT
+2. ✅ ~~Bouton statut backoffice~~ — FAIT
+3. **Sécurité admin localStorage → httpOnly cookie** ← PROCHAINE TÂCHE
    - Route Next.js `/api/auth/session`
    - Remplacer `localStorage.setItem('admin_token', ...)` partout dans `admin/`
 
@@ -344,6 +338,6 @@ cd server ; npx ts-node src/database/seed.ts
 
 ---
 
-*Dernière mise à jour : 6 juin 2026 — Sprint 0 foundations complet*
-*Référence CDC : `docs/CDC_Elec_Pro_Deals-v2.pdf`*
-*Source de vérité : `CLAUDE.md` v3 (remplace PROJECT.md désynchronisé)*
+*Dernière mise à jour : 8 juin 2026 — Sprint 1 démarré, 2/9 tâches done*
+*Référence CDC : `docs/CDC_Elec_Pro_Deals-v2.pdf` (indexé NotebookLM — notebook_id: af86efc2-aace-4555-b6e4-09df86482ebd)*
+*Source de vérité : `CLAUDE.md` v3*

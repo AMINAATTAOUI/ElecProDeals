@@ -115,7 +115,21 @@ export class OrdersService {
   }
 
   async updateStatus(id: string, status: OrderStatus): Promise<OrderEntity> {
+    const VALID_TRANSITIONS: Partial<Record<OrderStatus, OrderStatus[]>> = {
+      pending: ['confirmed'],
+      confirmed: ['shipped'],
+      shipped: ['delivered'],
+    };
+
     const order = await this.findOne(id);
+    const allowed = VALID_TRANSITIONS[order.status];
+
+    if (!allowed || !allowed.includes(status)) {
+      throw new BadRequestException(
+        `Cannot transition order from '${order.status}' to '${status}'`,
+      );
+    }
+
     order.status = status;
     return this.ordersRepository.save(order);
   }

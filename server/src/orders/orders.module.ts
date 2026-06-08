@@ -5,13 +5,14 @@ import { OrderItemEntity } from '../database/entities/order-item.entity';
 import { ProductEntity } from '../database/entities/product.entity';
 import { OrdersService } from './orders.service';
 import { OrdersController } from './orders.controller';
+import { RolesGuard } from '../common/guards/roles.guard';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([OrderEntity, OrderItemEntity, ProductEntity]),
   ],
   controllers: [OrdersController],
-  providers: [OrdersService],
+  providers: [OrdersService, RolesGuard],
   exports: [OrdersService],
 })
 export class OrdersModule {}

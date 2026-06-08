@@ -1,106 +1,125 @@
-# TASKS.md — ElecProDeals Backlog
-
-> Kanban technique du projet. Mis à jour après chaque étape.
-> Référence CC : `docs/CDC_Elec_Pro_Deals-v2.pdf` | Architecture : `PROJECT.md`
-
----
-
-## 🔲 TODO
-
-### PHASE 2 — Authentification
-- [ ] **feat/auth** — Écran Login (email + mot de passe)
-- [ ] **feat/auth** — JWT access token (15min) + refresh token (7j) avec rotation
-- [ ] **feat/auth** — Stockage tokens MMKV (chiffré)
-- [ ] **feat/auth** — Interceptor Axios — renouvellement automatique du token expiré
-- [ ] **feat/auth** — Biométrie Touch ID / Face ID (optionnel utilisateur)
-- [ ] **feat/auth** — Déconnexion automatique à l'expiry
-
-### PHASE 3 — Types TypeScript partagés
-- [ ] **feat/types** — `user.types.ts` : User, Role (client | commercial | admin)
-- [ ] **feat/types** — `product.types.ts` : Product, StockStatus, Category
-- [ ] **feat/types** — `order.types.ts` : Order, OrderStatus, OrderItem
-- [ ] **feat/types** — `invoice.types.ts` : Invoice, Quote, InvoiceStatus
-- [ ] **feat/types** — `pricing.types.ts` : PriceSheet, PricingRule, CustomerType
-
-### PHASE 4 — SageService (mocké)
-- [ ] **feat/sage** — Interface complète `SageService` (contrat TypeScript)
-- [ ] **feat/sage** — Mock catalogue produits (20 références réalistes)
-- [ ] **feat/sage** — Mock clients (artisan, gros installateur, grossiste)
-- [ ] **feat/sage** — Mock feuilles de prix (règles par typologie)
-- [ ] **feat/sage** — Mock devis et factures
-- [ ] **feat/sage** — Mock statuts commandes
-
-### PHASE 5 — Catalogue Produits
-- [ ] **feat/catalog** — Liste produits avec recherche multicritère
-- [ ] **feat/catalog** — Fiche produit détaillée (prix, stock, délais)
-- [ ] **feat/catalog** — Badge statut stock (disponible / rupture / délai)
-- [ ] **feat/catalog** — Moteur feuilles de prix B2B (calcul prix par client)
-- [ ] **feat/catalog** — Promotions temporaires (affichage campagnes)
-
-### PHASE 6 — Panier & Commande
-- [ ] **feat/cart** — Panier (ajout, suppression, quantités)
-- [ ] **feat/cart** — Redux slice `cart.slice.ts`
-- [ ] **feat/orders** — Processus de commande (checkout)
-- [ ] **feat/orders** — Envoi bon de commande → SageService
-- [ ] **feat/orders** — Suivi statut commande (en cours / expédiée / livrée)
-
-### PHASE 7 — Devis & Factures
-- [ ] **feat/invoices** — Liste devis client (depuis SageService)
-- [ ] **feat/invoices** — Liste factures client (depuis SageService)
-- [ ] **feat/invoices** — Suivi statut (accepté / en attente / facturé / payé)
-- [ ] **feat/invoices** — Téléchargement PDF *(à confirmer avec client)*
-
-### PHASE 8 — Notifications Push
-- [ ] **feat/notifications** — Config FCM (Android) + APNs (iOS)
-- [ ] **feat/notifications** — Notification changement statut commande
-- [ ] **feat/notifications** — Notification nouvelle campagne promo
-- [ ] **feat/notifications** — Gestion depuis backoffice (par client)
-
-### PHASE 9 — Rôle Commercial
-- [ ] **feat/commercial** — Parcours commande pour le compte d'un client
-- [ ] **feat/commercial** — Liste des clients du portefeuille
-
-### PHASE 10 — Backoffice Admin (Next.js)
-- [ ] **feat/admin** — Setup Next.js admin app
-- [ ] **feat/admin** — Gestion clients (créer / modifier / supprimer)
-- [ ] **feat/admin** — Import catalogue Excel
-- [ ] **feat/admin** — Gestion feuilles de prix
-- [ ] **feat/admin** — Suivi commandes en cours
-- [ ] **feat/admin** — Gestion promotions + notifications push
-
-### PHASE 11 — Stripe (Phase 2)
-- [ ] **feat/stripe** — Activer le module Stripe (remplacement du mock)
-- [ ] **feat/stripe** — Paiement CB natif mobile
+# TASKS.md — ElecProDeals
+> Kanban du projet — mis à jour par Claude Code à chaque fin de session.
+> Référence : CLAUDE.md v3 · HANDOFF.md · Workflows & Standards doc
+> Dernière mise à jour : Sprint 0 terminé — Juin 2026
 
 ---
 
-## ⚙️ IN PROGRESS
+## ✅ DONE — Sprint 0 (Fondations)
 
-### PHASE 1 — Setup Projet Expo ← ON EST ICI
-- [ ] Scaffolding projet avec `bunx fast-expo-app@latest` (NativeWind + React Query + Jest)
-- [ ] Import composants UI depuis `chvvkrishnakumar/expo-nativewind-template`
-- [ ] Structure de dossiers conforme à `PROJECT.md`
-- [ ] Configurer `.env` + variables d'environnement (API URL, etc.)
-- [ ] Vérifier TypeScript strict dans `tsconfig.json`
-- [ ] Premier écran de test (App fonctionnelle sur simulateur)
-
----
-
-## ✅ DONE
-
-- [x] Cahier des charges analysé
-- [x] Stack technique décidée (React Native + Expo, NestJS, PostgreSQL, Next.js)
-- [x] Stratégie Sage validée (SageService mocké → réel)
-- [x] Stratégie Stripe validée (module isolé, phase 2)
-- [x] Hébergement OVH validé
-- [x] 3 briques GitHub identifiées et vérifiées sur GitHub
-- [x] Architecture dossiers définie
-- [x] `PROJECT.md` créé
-- [x] `.github/copilot-instructions.md` configuré
-- [x] Repo Git initialisé (main + develop)
-- [x] Repo GitHub privé connecté + auto-push hook actif
-- [x] `.gitignore` Expo/RN configuré
+| Tâche | Commit | Notes |
+|-------|--------|-------|
+| Merge feat/backoffice → develop | `a797461` | 10 modules NestJS complets sur develop |
+| CLAUDE.md v3 placé à la racine | — | Constitution du projet pour Claude Code |
+| MMKV v4.3.1 + nitro-modules 0.35.9 | `a4f87a0` | Risque crash Android corrigé |
+| react-test-renderer → 19.1.0 | `ace061b` | Aligné avec React 19 |
+| Suppression passport-local | `fdce6a6` | Dépendance morte supprimée |
+| HANDOFF.md mis à jour | `5f34c42` | Sprint 0 tracé |
+| CI/CD GitHub Actions créé | `7ab287b` | TypeScript + ESLint + Jest sur 3 couches |
+| Fix ESLint mobile — eslint.config.js | — | Config Expo manquante ajoutée |
+| Fix ESLint server — CRLF + 2 vraies erreurs | — | prettier endOfLine auto + guard + unused var |
+| Fix ESLint admin — 4 erreurs JSX/hooks | — | unescaped entities + useEffect fixes |
+| Fix peer dependency @react-navigation | — | Conflit bottom-tabs résolu |
+| CI/CD vert sur les 3 couches | run #4 | ✅ Mobile + Server + Admin |
 
 ---
 
-*Dernière mise à jour : Avril 2026*
+## 🔴 IN PROGRESS — Sprint 1 (Finitions client pro)
+
+> Branche : `feat/sprint1-client` — créée depuis develop ✅
+> Objectif : parcours client professionnel 100% complet + sécurisé
+
+| # | Tâche | Couche | Priorité |
+|---|-------|--------|----------|
+| 1 | ✅ `PATCH /orders/:id/status` — transitions + RolesGuard | Server | 🔴 Bloquant démo |
+| 2 | ✅ Bouton statut aligné backend dans backoffice orders | Admin | 🔴 Bloquant démo |
+| 3 | Migrer admin_token localStorage → httpOnly cookie (`/api/auth/session`) | Admin | 🔴 Sécurité |
+| 4 | `@nestjs/throttler` sur POST /auth/login — max 5 req/min | Server | 🟠 Sécurité |
+| 5 | `helmet()` dans server/src/main.ts | Server | 🟠 Sécurité |
+| 6 | Dashboard stats branchées BDD (4 compteurs réels) | Admin | 🟠 Important |
+| 7 | Créer `users.controller.ts` — extraire routes depuis users.service.ts | Server | 🟠 Anti-pattern |
+| 8 | Unifier colors.ts / Colors.ts → garder constants/Colors.ts | Mobile | 🟡 Cosmétique |
+| 9 | Supprimer PROJECT.md désynchronisé | Racine | 🟡 Cosmétique |
+
+### Tests requis dans ce sprint
+| Fichier | Ce qu'il teste |
+|---------|---------------|
+| `roles.guard.spec.ts` | CLIENT_PRO ne peut pas accéder aux routes ADMIN/COMMERCIAL |
+| `sage.service.spec.ts` | Mock retourne données conformes aux interfaces TypeScript |
+| `auth.dto.spec.ts` | Email invalide, password court, champs manquants |
+| `orders.service.spec.ts` | Création, annulation, changement de statut |
+| `users.controller.spec.ts` | À créer après extraction du controller |
+| `pricing.service.spec.ts` | Compléter : exceptions individuelles + cascade + cas limites |
+
+---
+
+## 🟡 TODO — Sprint 2 (Distribution client)
+
+> Branche : `feat/sprint2-distribution` — après Sprint 1 mergé
+> Objectif : le client teste l'app sur son téléphone
+
+| # | Tâche | Couche | Notes |
+|---|-------|--------|-------|
+| 1 | Configurer EAS (expo.dev account + eas.json) | Mobile | Profils : development, preview, production |
+| 2 | `eas build --profile preview --platform all` | Mobile | QR code → client teste sur son téléphone |
+| 3 | Héberger backend temporairement (Railway ou Render) | Server | En attendant OVH post-validation client |
+| 4 | Variables d'environnement production (JWT secrets forts) | Server | GitHub Secrets + .env serveur |
+| 5 | Merge develop → main | Git | Après CI/CD vert + tests manuels complets |
+| 6 | Démo client | Livraison | Présentation + recueil feedback structuré |
+
+---
+
+## 🔲 TODO — Phase 3 (Selon feedback client)
+
+> Ne pas implémenter avant signal explicite
+> Ordre déterminé par les retours du client après démo
+
+| Tâche | Dépendance | Notes |
+|-------|-----------|-------|
+| Rôle commercial mobile (feat/commercial) | Feedback client | 3 écrans + 2 endpoints backend |
+| Stripe paiement CB réel | Feedback client | `STRIPE_ENABLED=true` — module déjà mocké |
+| Sage API réelle | Credentials client | `SAGE_MOCK_MODE=false` — SageService déjà abstrait |
+| Import catalogue Excel | Feedback client | Upload xlsx → parsing → ProductEntity |
+| Promotions temporaires | Feedback client | CDC §3.1 + §3.5 |
+| PDF factures téléchargeables | Feedback client | CDC §3.4 |
+| OVH VPS production | Post-validation | Docker + PostgreSQL + NestJS + Nginx + SSL |
+| SSL pinning mobile | Avant stores officiels | react-native-ssl-public-key-pinning |
+| App Store iOS | Post-validation | Apple Developer 99$/an + review |
+| Google Play Android | Post-validation | Google Play Console 25$ one-time |
+| Transporteurs FedEx / Geodis | Optionnel | CDC §4.2 — selon besoin client |
+
+---
+
+## 📋 Instructions Claude Code — utilisation de ce fichier
+
+### Début de session
+```
+"Lis CLAUDE.md et TASKS.md. Branche active : feat/xxx.
+Objectif de cette session : [tâches du sprint en cours]."
+```
+
+### Pendant la session
+- Marque chaque tâche terminée avec ✅ dans TASKS.md
+- Un commit par tâche significative
+- Si une nouvelle tâche émerge → l'ajouter dans le bon sprint
+
+### Fin de session
+```
+"Mets à jour TASKS.md (tâches terminées) et HANDOFF.md 
+(état exact du projet). Commite et push sur develop."
+```
+
+---
+
+## 🔢 Compteurs de progression
+
+| Sprint | Total | Done | Restant |
+|--------|-------|------|---------|
+| Sprint 0 — Fondations | 12 | 12 | 0 ✅ |
+| Sprint 1 — Client pro | 9 + 6 tests | 2 | 13 |
+| Sprint 2 — Distribution | 6 | 0 | 6 |
+| Phase 3 — Post-feedback | 11 | 0 | 11 |
+
+---
+
+*ElecProDeals — mis à jour automatiquement par Claude Code à chaque session*
