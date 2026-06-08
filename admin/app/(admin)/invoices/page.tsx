@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { apiFetch } from '@/lib/api';
+import { useAdminToken } from '@/hooks/useAdminToken';
 import type { Invoice, Quote, InvoiceStatus, QuoteStatus } from '@/lib/types';
 
 const INVOICE_STATUS_LABELS: Record<InvoiceStatus, string> = {
@@ -41,16 +42,15 @@ function formatDate(dateStr: string): string {
 }
 
 export default function InvoicesPage() {
+  const { token } = useAdminToken();
   const [activeTab, setActiveTab] = useState<Tab>('invoices');
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const token =
-    typeof window !== 'undefined' ? (localStorage.getItem('admin_token') ?? '') : '';
-
   useEffect(() => {
+    if (!token) return;
     // eslint-disable-next-line react-hooks/set-state-in-effect -- loading reset is intentional before async fetch
     setLoading(true);
     setError(null);

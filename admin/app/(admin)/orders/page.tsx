@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Order, OrderStatus } from '@/lib/types';
 import { apiFetch } from '@/lib/api';
+import { useAdminToken } from '@/hooks/useAdminToken';
 
 const STATUS_LABELS: Record<OrderStatus, string> = {
   pending: 'En attente',
@@ -31,14 +32,14 @@ const NEXT_STATUSES: Partial<Record<OrderStatus, OrderStatus>> = {
 const CANCELLABLE: OrderStatus[] = ['pending', 'confirmed'];
 
 export default function OrdersPage() {
+  const { token } = useAdminToken();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
-  const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') ?? '' : '';
-
   useEffect(() => {
+    if (!token) return;
     apiFetch<Order[]>('/orders', token)
       .then(setOrders)
       .catch(() => setError('Impossible de charger les commandes'))

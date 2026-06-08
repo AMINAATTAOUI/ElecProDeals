@@ -4,6 +4,7 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 import { Product } from '@/lib/types';
 import { apiFetch } from '@/lib/api';
+import { useAdminToken } from '@/hooks/useAdminToken';
 import { CheckCircle, XCircle, Clock, AlertCircle } from 'lucide-react';
 
 const STOCK_LABELS: Record<string, string> = {
@@ -21,14 +22,14 @@ const STOCK_ICONS: Record<string, React.ReactNode> = {
 };
 
 export default function CatalogPage() {
+  const { token } = useAdminToken();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
 
-  const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') ?? '' : '';
-
   useEffect(() => {
+    if (!token) return;
     apiFetch<Product[]>('/catalog', token)
       .then(setProducts)
       .catch(() => setError('Impossible de charger le catalogue'))

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { apiFetch } from '@/lib/api';
+import { useAdminToken } from '@/hooks/useAdminToken';
 import type { PriceSheet, PricingRule, PricingRuleOperator, CustomerType } from '@/lib/types';
 import { Plus, Pencil, Trash2, ChevronDown, ChevronRight, CheckCircle2, XCircle } from 'lucide-react';
 
@@ -52,6 +53,7 @@ const emptyForm = (): SheetForm => ({
 });
 
 export default function PricingPage() {
+  const { token } = useAdminToken();
   const [sheets, setSheets] = useState<PriceSheet[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -64,12 +66,8 @@ export default function PricingPage() {
   const [saving, setSaving] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
-  const token =
-    typeof window !== 'undefined'
-      ? (localStorage.getItem('admin_token') ?? '')
-      : '';
-
   const loadSheets = useCallback(async () => {
+    if (!token) return;
     try {
       setLoading(true);
       const data = await apiFetch<PriceSheet[]>('/pricing/sheets', token);
