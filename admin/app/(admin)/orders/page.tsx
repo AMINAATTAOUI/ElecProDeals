@@ -22,12 +22,13 @@ const STATUS_COLORS: Record<OrderStatus, string> = {
   cancelled: 'bg-red-500/20 text-red-400',
 };
 
-const NEXT_STATUSES: Partial<Record<OrderStatus, OrderStatus[]>> = {
-  pending: ['confirmed', 'cancelled'],
-  confirmed: ['processing', 'cancelled'],
-  processing: ['shipped'],
-  shipped: ['delivered'],
+const NEXT_STATUSES: Partial<Record<OrderStatus, OrderStatus>> = {
+  pending: 'confirmed',
+  confirmed: 'shipped',
+  shipped: 'delivered',
 };
+
+const CANCELLABLE: OrderStatus[] = ['pending', 'confirmed'];
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -56,6 +57,20 @@ export default function OrdersPage() {
       );
     } catch {
       alert('Erreur lors de la mise à jour du statut');
+    } finally {
+      setUpdatingId(null);
+    }
+  }
+
+  async function handleCancel(orderId: string) {
+    setUpdatingId(orderId);
+    try {
+      await apiFetch(`/orders/${orderId}/cancel`, token, { method: 'PATCH' });
+      setOrders((prev) =>
+        prev.map((o) => (o.id === orderId ? { ...o, status: 'cancelled' } : o))
+      );
+    } catch {
+      alert('Erreur lors de l\'annulation');
     } finally {
       setUpdatingId(null);
     }
@@ -120,20 +135,26 @@ export default function OrdersPage() {
                   {new Date(order.createdAt).toLocaleDateString('fr-FR')}
                 </td>
                 <td className="px-4 py-3">
-                  {NEXT_STATUSES[order.status] && (
-                    <div className="flex gap-2 flex-wrap">
-                      {NEXT_STATUSES[order.status]!.map((nextStatus) => (
-                        <button
-                          key={nextStatus}
-                          onClick={() => handleStatusChange(order.id, nextStatus)}
-                          disabled={updatingId === order.id}
-                          className="rounded-md bg-zinc-700 px-2 py-1 text-xs text-zinc-300 hover:bg-zinc-600 disabled:opacity-50 transition-colors"
-                        >
-                          → {STATUS_LABELS[nextStatus]}
-                        </button>
-                      ))}
-                    </div>
-                  )}
+                  <div className="flex gap-2 flex-wrap">
+                    {NEXT_STATUSES[order.status] && (
+                      <button
+                        onClick={() => handleStatusChange(order.id, NEXT_STATUSES[order.status]!)}
+                        disabled={updatingId === order.id}
+                        className="rounded-md bg-zinc-700 px-2 py-1 text-xs text-zinc-300 hover:bg-zinc-600 disabled:opacity-50 transition-colors"
+                      >
+                        → {STATUS_LABELS[NEXT_STATUSES[order.status]!]}
+                      </button>
+                    )}
+                    {CANCELLABLE.includes(order.status) && (
+                      <button
+                        onClick={() => handleCancel(order.id)}
+                        disabled={updatingId === order.id}
+                        className="rounded-md bg-red-900/40 px-2 py-1 text-xs text-red-400 hover:bg-red-900/70 disabled:opacity-50 transition-colors"
+                      >
+                        Annuler
+                      </button>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
