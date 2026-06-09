@@ -28,6 +28,11 @@ export class AdminService {
           .where('DATE(o.created_at) = CURRENT_DATE')
           .getCount(),
 
+        // TODO: logique CA à confirmer avec le client
+        // Actuellement : toutes commandes sauf cancelled
+        // Option A (actuel) : pending + confirmed + shipped + delivered
+        // Option B : delivered uniquement (CA réalisé)
+        // Décision en attente feedback client
         this.ordersRepo
           .createQueryBuilder('o')
           .select('COALESCE(SUM(o.total), 0)', 'revenue')
