@@ -31,6 +31,12 @@ async function bootstrap() {
   const dataSource = app.get(DataSource);
   await seedPriceSheets(dataSource);
 
+  // Health check pour Railway / load balancers
+  const httpAdapter = app.getHttpAdapter();
+  httpAdapter.get('/health', (_req: unknown, res: { json: (o: object) => void }) =>
+    res.json({ status: 'ok' }),
+  );
+
   const port = process.env['PORT'] ?? 3000;
   await app.listen(port);
   console.log(`Backend ElecProDeals démarré sur le port ${port}`);
