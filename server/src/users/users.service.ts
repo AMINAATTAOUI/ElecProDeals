@@ -4,25 +4,9 @@ import { Repository } from 'typeorm';
 import { UserEntity } from '../database/entities/user.entity';
 import { OrderEntity } from '../database/entities/order.entity';
 import { NotificationEntity } from '../database/entities/notification.entity';
-import { IsOptional, IsString, IsBoolean, IsUUID } from 'class-validator';
+import { UpdateUserDto } from './dto/update-user.dto';
 
-export class UpdateUserDto {
-  @IsOptional()
-  @IsUUID()
-  pricingSheetId?: string | null;
-
-  @IsOptional()
-  @IsBoolean()
-  isActive?: boolean;
-
-  @IsOptional()
-  @IsBoolean()
-  isPaymentDeferred?: boolean;
-
-  @IsOptional()
-  @IsString()
-  assignedCommercialId?: string | null;
-}
+export { UpdateUserDto };
 
 @Injectable()
 export class UsersService {

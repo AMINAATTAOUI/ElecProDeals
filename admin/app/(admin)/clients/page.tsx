@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { User, UserRole, PriceSheet } from '@/lib/types';
 import { apiFetch } from '@/lib/api';
+import { useAdminToken } from '@/hooks/useAdminToken';
 import { CheckCircle, XCircle, Tag } from 'lucide-react';
 
 const ROLE_LABELS: Record<UserRole, string> = {
@@ -92,6 +93,7 @@ function AssignModal({ user, sheets, token, onClose, onSaved }: AssignModalProps
 }
 
 export default function ClientsPage() {
+  const { token } = useAdminToken();
   const [users, setUsers] = useState<User[]>([]);
   const [sheets, setSheets] = useState<PriceSheet[]>([]);
   const [loading, setLoading] = useState(true);
@@ -99,9 +101,8 @@ export default function ClientsPage() {
   const [filter, setFilter] = useState<UserRole | 'all'>('all');
   const [assigningUser, setAssigningUser] = useState<User | null>(null);
 
-  const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') ?? '' : '';
-
   useEffect(() => {
+    if (!token) return;
     Promise.all([
       apiFetch<User[]>('/users', token),
       apiFetch<PriceSheet[]>('/pricing/sheets', token),

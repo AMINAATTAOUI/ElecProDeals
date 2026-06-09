@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Bell, Send } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
+import { useAdminToken } from '@/hooks/useAdminToken';
 import type { Notification } from '@/lib/types';
 
 function formatDate(dateStr: string): string {
@@ -16,6 +17,7 @@ function formatDate(dateStr: string): string {
 }
 
 export default function NotificationsPage() {
+  const { token } = useAdminToken();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
@@ -26,10 +28,8 @@ export default function NotificationsPage() {
   const [body, setBody] = useState('');
   const [targetClientId, setTargetClientId] = useState('');
 
-  const token =
-    typeof window !== 'undefined' ? (localStorage.getItem('admin_token') ?? '') : '';
-
   useEffect(() => {
+    if (!token) return;
     apiFetch<Notification[]>('/notifications', token)
       .then(setNotifications)
       .catch(() => setError('Impossible de charger les notifications'))

@@ -32,9 +32,11 @@ export default function LoginPage() {
       }
 
       const data = (await res.json()) as { accessToken: string };
-      localStorage.setItem('admin_token', data.accessToken);
-      // Cookie pour le middleware (route protection)
-      document.cookie = `admin_token=${data.accessToken}; path=/; SameSite=Strict`;
+      await fetch('/api/auth/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: data.accessToken }),
+      });
       router.push('/dashboard');
     } catch {
       setError('Connexion au serveur impossible');
