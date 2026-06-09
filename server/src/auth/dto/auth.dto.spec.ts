@@ -9,12 +9,18 @@ async function validateDto(plain: object) {
 
 describe('LoginDto', () => {
   it('passes with valid email and password', async () => {
-    const errors = await validateDto({ email: 'client@demo.fr', password: 'password123' });
+    const errors = await validateDto({
+      email: 'client@demo.fr',
+      password: 'password123',
+    });
     expect(errors).toHaveLength(0);
   });
 
   it('fails with invalid email format', async () => {
-    const errors = await validateDto({ email: 'not-an-email', password: 'password123' });
+    const errors = await validateDto({
+      email: 'not-an-email',
+      password: 'password123',
+    });
     expect(errors.some((e) => e.property === 'email')).toBe(true);
   });
 
@@ -24,7 +30,10 @@ describe('LoginDto', () => {
   });
 
   it('fails with password shorter than 8 characters', async () => {
-    const errors = await validateDto({ email: 'client@demo.fr', password: 'short' });
+    const errors = await validateDto({
+      email: 'client@demo.fr',
+      password: 'short',
+    });
     expect(errors.some((e) => e.property === 'password')).toBe(true);
   });
 

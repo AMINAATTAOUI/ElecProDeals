@@ -17,7 +17,10 @@ describe('SageService', () => {
     const module = await Test.createTestingModule({
       providers: [
         SageService,
-        { provide: getRepositoryToken(ProductEntity), useValue: mockProductsRepo },
+        {
+          provide: getRepositoryToken(ProductEntity),
+          useValue: mockProductsRepo,
+        },
       ],
     }).compile();
 
@@ -68,7 +71,9 @@ describe('SageService', () => {
         expect(Array.isArray(q.items)).toBe(true);
         expect(q.items.length).toBeGreaterThan(0);
         expect(typeof q.totalHT).toBe('number');
-        expect(['pending', 'accepted', 'refused', 'expired']).toContain(q.status);
+        expect(['pending', 'accepted', 'refused', 'expired']).toContain(
+          q.status,
+        );
         expect(q.validUntil).toBeInstanceOf(Date);
         expect(q.issuedAt).toBeInstanceOf(Date);
       }

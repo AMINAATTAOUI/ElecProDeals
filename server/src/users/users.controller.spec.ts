@@ -20,9 +20,11 @@ const mockUser = (role = 'client'): Partial<UserEntity> => ({
 
 const mockUsersService = {
   findAll: jest.fn().mockResolvedValue([mockUser()]),
-  update: jest.fn().mockImplementation((id: string, dto: object) =>
-    Promise.resolve({ ...mockUser(), ...dto }),
-  ),
+  update: jest
+    .fn()
+    .mockImplementation((id: string, dto: object) =>
+      Promise.resolve({ ...mockUser(), ...dto }),
+    ),
   deleteUser: jest.fn().mockResolvedValue({ deleted: true }),
   exportUserData: jest.fn().mockResolvedValue({
     profile: mockUser(),
@@ -56,7 +58,9 @@ describe('UsersController', () => {
 
   it('update delegates to service', async () => {
     const result = await controller.update('user-uuid-1', { isActive: false });
-    expect(mockUsersService.update).toHaveBeenCalledWith('user-uuid-1', { isActive: false });
+    expect(mockUsersService.update).toHaveBeenCalledWith('user-uuid-1', {
+      isActive: false,
+    });
     expect(result).toMatchObject({ isActive: false });
   });
 
@@ -75,7 +79,9 @@ describe('UsersController', () => {
 
   it('exportData throws ForbiddenException when client accesses another account', () => {
     const req = { user: { id: 'other-uuid', role: 'client' } };
-    expect(() => controller.exportData('user-uuid-1', req)).toThrow(ForbiddenException);
+    expect(() => controller.exportData('user-uuid-1', req)).toThrow(
+      ForbiddenException,
+    );
   });
 
   it('exportData allows admin to access any account', async () => {

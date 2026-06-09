@@ -1,4 +1,8 @@
-import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Test } from '@nestjs/testing';
 import { OrdersService } from './orders.service';
@@ -6,23 +10,22 @@ import { OrderEntity } from '../database/entities/order.entity';
 import { OrderItemEntity } from '../database/entities/order-item.entity';
 import { ProductEntity } from '../database/entities/product.entity';
 
-const mockOrder = (overrides: Partial<OrderEntity> = {}): OrderEntity =>
-  ({
-    id: 'order-uuid-1',
-    orderNumber: 'EPD-20260101-1234',
-    clientId: 'client-uuid-1',
-    commercialId: null,
-    status: 'pending',
-    paymentMethod: 'deferred',
-    subtotal: 100,
-    total: 100,
-    notes: null,
-    sageOrderRef: null,
-    items: [],
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    ...overrides,
-  } as OrderEntity);
+const mockOrder = (overrides: Partial<OrderEntity> = {}): OrderEntity => ({
+  id: 'order-uuid-1',
+  orderNumber: 'EPD-20260101-1234',
+  clientId: 'client-uuid-1',
+  commercialId: null,
+  status: 'pending',
+  paymentMethod: 'deferred',
+  subtotal: 100,
+  total: 100,
+  notes: null,
+  sageOrderRef: null,
+  items: [],
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  ...overrides,
+});
 
 const mockProduct = (): ProductEntity =>
   ({
@@ -31,9 +34,9 @@ const mockProduct = (): ProductEntity =>
     name: 'Câble 2.5mm²',
     publicPrice: 10,
     isActive: true,
-  } as ProductEntity);
+  }) as ProductEntity;
 
-function makeRepo<T>(overrides: Partial<Record<string, jest.Mock>> = {}) {
+function makeRepo(overrides: Partial<Record<string, jest.Mock>> = {}) {
   return {
     findOne: jest.fn(),
     find: jest.fn(),
@@ -69,7 +72,10 @@ describe('OrdersService', () => {
   describe('createOrder', () => {
     it('throws BadRequestException when items array is empty', async () => {
       await expect(
-        service.createOrder('client-1', { items: [], paymentMethod: 'deferred' }),
+        service.createOrder('client-1', {
+          items: [],
+          paymentMethod: 'deferred',
+        }),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -86,7 +92,9 @@ describe('OrdersService', () => {
     it('creates order and computes total from product price', async () => {
       const product = mockProduct();
       productsRepo.findByIds.mockResolvedValue([product]);
-      ordersRepo.save.mockImplementation((o: OrderEntity) => Promise.resolve(o));
+      ordersRepo.save.mockImplementation((o: OrderEntity) =>
+        Promise.resolve(o),
+      );
 
       const result = await service.createOrder('client-1', {
         items: [{ productId: product.id, quantity: 3 }],
@@ -112,18 +120,18 @@ describe('OrdersService', () => {
       const order = mockOrder({ status: 'delivered' });
       ordersRepo.findOne.mockResolvedValue(order);
 
-      await expect(service.cancelOrder(order.id, order.clientId)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(
+        service.cancelOrder(order.id, order.clientId),
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('throws ForbiddenException when client does not own the order', async () => {
       const order = mockOrder({ clientId: 'owner-uuid' });
       ordersRepo.findOne.mockResolvedValue(order);
 
-      await expect(service.cancelOrder(order.id, 'other-client')).rejects.toThrow(
-        ForbiddenException,
-      );
+      await expect(
+        service.cancelOrder(order.id, 'other-client'),
+      ).rejects.toThrow(ForbiddenException);
     });
   });
 
@@ -161,9 +169,9 @@ describe('OrdersService', () => {
     it('throws NotFoundException when order does not exist', async () => {
       ordersRepo.findOne.mockResolvedValue(null);
 
-      await expect(service.updateStatus('ghost-id', 'confirmed')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        service.updateStatus('ghost-id', 'confirmed'),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 });

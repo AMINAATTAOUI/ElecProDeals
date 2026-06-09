@@ -32,7 +32,7 @@ export class AdminService {
           .createQueryBuilder('o')
           .select('COALESCE(SUM(o.total), 0)', 'revenue')
           .where(
-            "EXTRACT(YEAR FROM o.created_at) = EXTRACT(YEAR FROM NOW()) AND EXTRACT(MONTH FROM o.created_at) = EXTRACT(MONTH FROM NOW())",
+            'EXTRACT(YEAR FROM o.created_at) = EXTRACT(YEAR FROM NOW()) AND EXTRACT(MONTH FROM o.created_at) = EXTRACT(MONTH FROM NOW())',
           )
           .andWhere("o.status NOT IN ('cancelled')")
           .getRawOne<{ revenue: string }>(),
