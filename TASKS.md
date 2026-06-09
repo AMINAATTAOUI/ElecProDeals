@@ -1,7 +1,7 @@
 # TASKS.md — ElecProDeals
 > Kanban du projet — mis à jour par Claude Code à chaque fin de session.
 > Référence : CLAUDE.md v3 · HANDOFF.md · Workflows & Standards doc
-> Dernière mise à jour : Sprint 0 terminé — Juin 2026
+> Dernière mise à jour : Sprint 1 terminé — 9 juin 2026
 
 ---
 
@@ -24,38 +24,54 @@
 
 ---
 
-## 🔴 IN PROGRESS — Sprint 1 (Finitions client pro)
+## ✅ DONE — Sprint 1 (Finitions client pro)
 
-> Branche : `feat/sprint1-client` — créée depuis develop ✅
-> Objectif : parcours client professionnel 100% complet + sécurisé
+> Branche : `feat/sprint1-client` — PR #1 ouvert vers `develop`
+> CI : ✅ 3 jobs passed (Mobile + Server + Admin)
+> Merge conditionnel : valider httpOnly cookie DevTools + décision CA (voir TODO)
+
+| # | Tâche | Commit | Notes |
+|---|-------|--------|-------|
+| 1 | ✅ `PATCH /orders/:id/status` — transitions + RolesGuard | `4a55965` | pending→confirmed→shipped→delivered uniquement |
+| 2 | ✅ Bouton statut aligné backend dans backoffice orders | `e6eb3b8` | NEXT_STATUSES map + bouton Annuler séparé |
+| 3 | ✅ Migrer admin_token localStorage → httpOnly cookie | `f7af931` | `/api/auth/session` + hook `useAdminToken` — 6 pages |
+| 4 | ✅ `@nestjs/throttler` sur POST /auth/login — max 5 req/min | `beefb37` | ThrottlerGuard + @Throttle sur login uniquement |
+| 5 | ✅ `helmet()` dans server/src/main.ts | `beefb37` | Headers sécurité HTTP activés |
+| 6 | ✅ Dashboard stats branchées BDD (4 compteurs réels) | `5e78620` | AdminModule + GET /admin/stats (admin guard) |
+| 7 | ✅ `UpdateUserDto` extrait vers users/dto/update-user.dto.ts | `bf11c76` | users.controller.ts existait déjà |
+
+### Tests Sprint 1 — 50 tests, 7 suites, 0 échec ✅
+
+| Fichier | Commit | Notes |
+|---------|--------|-------|
+| `roles.guard.spec.ts` | `bf11c76` | allow/block par rôle, cas no-user |
+| `sage.service.spec.ts` | `bf11c76` | mock invoices/quotes conformes interfaces TypeScript |
+| `auth.dto.spec.ts` | `bf11c76` | email invalide, password court, champs manquants |
+| `orders.service.spec.ts` | `bf11c76` | création, annulation, transitions valides/invalides |
+| `users.controller.spec.ts` | `bf11c76` | findAll, update, delete, exportData access control |
+| `pricing.service.spec.ts` | — | ⚠️ Non fait — à compléter (cascade + exceptions individuelles) |
+
+### ⚠️ Décision en attente avant merge PR #1
+
+| Point | Action |
+|-------|--------|
+| CA du mois — méthode de calcul | TODO posé dans `admin.service.ts` — Option A (actuel, toutes sauf cancelled) ou Option B (delivered uniquement) → **demander au client** |
+| httpOnly cookie — validation visuelle | DevTools → Application → Cookies → colonne HttpOnly ✅ + `document.cookie` ne doit pas afficher le token |
+
+---
+
+## 🟡 TODO — Sprint 1 cosmétique (post-merge, non bloquant)
 
 | # | Tâche | Couche | Priorité |
 |---|-------|--------|----------|
-| 1 | ✅ `PATCH /orders/:id/status` — transitions + RolesGuard | Server | 🔴 Bloquant démo |
-| 2 | ✅ Bouton statut aligné backend dans backoffice orders | Admin | 🔴 Bloquant démo |
-| 3 | Migrer admin_token localStorage → httpOnly cookie (`/api/auth/session`) | Admin | 🔴 Sécurité |
-| 4 | `@nestjs/throttler` sur POST /auth/login — max 5 req/min | Server | 🟠 Sécurité |
-| 5 | `helmet()` dans server/src/main.ts | Server | 🟠 Sécurité |
-| 6 | Dashboard stats branchées BDD (4 compteurs réels) | Admin | 🟠 Important |
-| 7 | Créer `users.controller.ts` — extraire routes depuis users.service.ts | Server | 🟠 Anti-pattern |
 | 8 | Unifier colors.ts / Colors.ts → garder constants/Colors.ts | Mobile | 🟡 Cosmétique |
 | 9 | Supprimer PROJECT.md désynchronisé | Racine | 🟡 Cosmétique |
-
-### Tests requis dans ce sprint
-| Fichier | Ce qu'il teste |
-|---------|---------------|
-| `roles.guard.spec.ts` | CLIENT_PRO ne peut pas accéder aux routes ADMIN/COMMERCIAL |
-| `sage.service.spec.ts` | Mock retourne données conformes aux interfaces TypeScript |
-| `auth.dto.spec.ts` | Email invalide, password court, champs manquants |
-| `orders.service.spec.ts` | Création, annulation, changement de statut |
-| `users.controller.spec.ts` | À créer après extraction du controller |
-| `pricing.service.spec.ts` | Compléter : exceptions individuelles + cascade + cas limites |
 
 ---
 
 ## 🟡 TODO — Sprint 2 (Distribution client)
 
-> Branche : `feat/sprint2-distribution` — après Sprint 1 mergé
+> Branche : `feat/sprint2-distribution` — après Sprint 1 mergé dans develop
 > Objectif : le client teste l'app sur son téléphone
 
 | # | Tâche | Couche | Notes |
@@ -116,7 +132,7 @@ Objectif de cette session : [tâches du sprint en cours]."
 | Sprint | Total | Done | Restant |
 |--------|-------|------|---------|
 | Sprint 0 — Fondations | 12 | 12 | 0 ✅ |
-| Sprint 1 — Client pro | 9 + 6 tests | 2 | 13 |
+| Sprint 1 — Client pro | 7 tâches + 5 tests | 12 | 1 test pricing + 2 cosmétiques |
 | Sprint 2 — Distribution | 6 | 0 | 6 |
 | Phase 3 — Post-feedback | 11 | 0 | 11 |
 
